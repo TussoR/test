@@ -56,6 +56,28 @@
       transition: all 0.55s cubic-bezier(0.2, 0.8, 0.25, 1);
       transform-style: preserve-3d;
     }
+    .category-preview {
+      overflow: hidden;
+      border-radius: inherit;
+    }
+    .category-preview img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0;
+      transition: opacity 1.4s ease;
+    }
+    .category-preview img.cp-active {
+      opacity: 0.22;
+    }
+    .category-preview::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(12,9,12,0.35), rgba(12,9,12,0.88));
+    }
     /* Builder mode: inline editing affordances */
     body.builder-active [data-bd-editable="true"] {
       cursor: text;
@@ -75,6 +97,18 @@
     }
     body.builder-active .group:hover .card-remove-btn {
       display: flex !important;
+    }
+    body.builder-active .img-stage {
+      cursor: grab;
+    }
+    body.builder-active .img-stage:active {
+      cursor: grabbing;
+    }
+    .img-stage img {
+      will-change: transform;
+    }
+    .card-category-select {
+      display: none;
     }
     #builder-toolbar {
       position: fixed;
@@ -316,30 +350,13 @@
 <p class="font-body-md text-zinc-400 text-sm sm:text-base font-light max-w-3xl leading-relaxed">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor.</p>
 </div>
 <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="categories-grid">
-<div class="group relative bg-[#0c090c] border border-red-950/60 hover:border-red-600/60 rounded-xl overflow-hidden p-6 flex flex-col gap-4 transition-all duration-300 crimson-glow-hover"><button type="button" class="card-remove-btn" style="display:none;position:absolute;top:8px;right:8px;z-index:30;width:26px;height:26px;border-radius:9999px;background:rgba(0,0,0,0.85);border:1px solid #b91c1c;align-items:center;justify-content:center;color:#f87171;cursor:pointer;" aria-label="Remove category" title="Remove category"><span class="material-symbols-outlined" style="font-size:15px;">close</span></button>
-<div class="flex items-center justify-between">
-<span class="font-label-mono text-[11px] text-red-400/80 uppercase tracking-widest">01</span>
-<span class="material-symbols-outlined text-[16px] text-zinc-500 group-hover:text-red-400 group-hover:translate-x-1 transition-all">north_east</span>
-</div>
-<h4 class="font-headline-sm text-lg text-[#f4f4f5] font-bold uppercase tracking-wider group-hover:text-red-400 transition-colors">Lorem Ipsum 1</h4>
-<p class="font-body-md text-zinc-400 text-sm font-light leading-relaxed">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
-</div>
-<div class="group relative bg-[#0c090c] border border-red-950/60 hover:border-red-600/60 rounded-xl overflow-hidden p-6 flex flex-col gap-4 transition-all duration-300 crimson-glow-hover"><button type="button" class="card-remove-btn" style="display:none;position:absolute;top:8px;right:8px;z-index:30;width:26px;height:26px;border-radius:9999px;background:rgba(0,0,0,0.85);border:1px solid #b91c1c;align-items:center;justify-content:center;color:#f87171;cursor:pointer;" aria-label="Remove category" title="Remove category"><span class="material-symbols-outlined" style="font-size:15px;">close</span></button>
-<div class="flex items-center justify-between">
-<span class="font-label-mono text-[11px] text-red-400/80 uppercase tracking-widest">02</span>
-<span class="material-symbols-outlined text-[16px] text-zinc-500 group-hover:text-red-400 group-hover:translate-x-1 transition-all">north_east</span>
-</div>
-<h4 class="font-headline-sm text-lg text-[#f4f4f5] font-bold uppercase tracking-wider group-hover:text-red-400 transition-colors">Lorem Ipsum 2</h4>
-<p class="font-body-md text-zinc-400 text-sm font-light leading-relaxed">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
-</div>
-<div class="group relative bg-[#0c090c] border border-red-950/60 hover:border-red-600/60 rounded-xl overflow-hidden p-6 flex flex-col gap-4 transition-all duration-300 crimson-glow-hover"><button type="button" class="card-remove-btn" style="display:none;position:absolute;top:8px;right:8px;z-index:30;width:26px;height:26px;border-radius:9999px;background:rgba(0,0,0,0.85);border:1px solid #b91c1c;align-items:center;justify-content:center;color:#f87171;cursor:pointer;" aria-label="Remove category" title="Remove category"><span class="material-symbols-outlined" style="font-size:15px;">close</span></button>
-<div class="flex items-center justify-between">
-<span class="font-label-mono text-[11px] text-red-400/80 uppercase tracking-widest">03</span>
-<span class="material-symbols-outlined text-[16px] text-zinc-500 group-hover:text-red-400 group-hover:translate-x-1 transition-all">north_east</span>
-</div>
-<h4 class="font-headline-sm text-lg text-[#f4f4f5] font-bold uppercase tracking-wider group-hover:text-red-400 transition-colors">Lorem Ipsum 3</h4>
-<p class="font-body-md text-zinc-400 text-sm font-light leading-relaxed">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
-</div>
+<div class="group relative bg-[#0c090c] border border-red-950/60 hover:border-red-600/60 rounded-xl overflow-hidden p-6 flex flex-col gap-4 transition-all duration-300 crimson-glow-hover"><button type="button" class="card-remove-btn" style="display:none;position:absolute;top:8px;right:8px;z-index:30;width:26px;height:26px;border-radius:9999px;background:rgba(0,0,0,0.85);border:1px solid #b91c1c;align-items:center;justify-content:center;color:#f87171;cursor:pointer;" aria-label="Remove category" title="Remove category"><span class="material-symbols-outlined" style="font-size:15px;">close</span></button><div class="category-preview absolute inset-0 z-0 pointer-events-none"></div><div class="relative z-10 flex flex-col gap-4"><div class="flex items-center justify-between"><span class="font-label-mono text-[11px] text-red-400/80 uppercase tracking-widest">01</span><span class="material-symbols-outlined text-[16px] text-zinc-500 group-hover:text-red-400 group-hover:translate-x-1 transition-all">north_east</span></div><h4 class="font-headline-sm text-lg text-[#f4f4f5] font-bold uppercase tracking-wider group-hover:text-red-400 transition-colors">Male Hair</h4><p class="font-body-md text-zinc-400 text-sm font-light leading-relaxed">Stylized male hairstyles built for Roblox UGC groups, game-ready and optimized.</p></div></div>
+<div class="group relative bg-[#0c090c] border border-red-950/60 hover:border-red-600/60 rounded-xl overflow-hidden p-6 flex flex-col gap-4 transition-all duration-300 crimson-glow-hover"><button type="button" class="card-remove-btn" style="display:none;position:absolute;top:8px;right:8px;z-index:30;width:26px;height:26px;border-radius:9999px;background:rgba(0,0,0,0.85);border:1px solid #b91c1c;align-items:center;justify-content:center;color:#f87171;cursor:pointer;" aria-label="Remove category" title="Remove category"><span class="material-symbols-outlined" style="font-size:15px;">close</span></button><div class="category-preview absolute inset-0 z-0 pointer-events-none"></div><div class="relative z-10 flex flex-col gap-4"><div class="flex items-center justify-between"><span class="font-label-mono text-[11px] text-red-400/80 uppercase tracking-widest">02</span><span class="material-symbols-outlined text-[16px] text-zinc-500 group-hover:text-red-400 group-hover:translate-x-1 transition-all">north_east</span></div><h4 class="font-headline-sm text-lg text-[#f4f4f5] font-bold uppercase tracking-wider group-hover:text-red-400 transition-colors">Girl Hair</h4><p class="font-body-md text-zinc-400 text-sm font-light leading-relaxed">Feminine hair styles sculpted and textured for Roblox avatar customization.</p></div></div>
+<div class="group relative bg-[#0c090c] border border-red-950/60 hover:border-red-600/60 rounded-xl overflow-hidden p-6 flex flex-col gap-4 transition-all duration-300 crimson-glow-hover"><button type="button" class="card-remove-btn" style="display:none;position:absolute;top:8px;right:8px;z-index:30;width:26px;height:26px;border-radius:9999px;background:rgba(0,0,0,0.85);border:1px solid #b91c1c;align-items:center;justify-content:center;color:#f87171;cursor:pointer;" aria-label="Remove category" title="Remove category"><span class="material-symbols-outlined" style="font-size:15px;">close</span></button><div class="category-preview absolute inset-0 z-0 pointer-events-none"></div><div class="relative z-10 flex flex-col gap-4"><div class="flex items-center justify-between"><span class="font-label-mono text-[11px] text-red-400/80 uppercase tracking-widest">03</span><span class="material-symbols-outlined text-[16px] text-zinc-500 group-hover:text-red-400 group-hover:translate-x-1 transition-all">north_east</span></div><h4 class="font-headline-sm text-lg text-[#f4f4f5] font-bold uppercase tracking-wider group-hover:text-red-400 transition-colors">UGC</h4><p class="font-body-md text-zinc-400 text-sm font-light leading-relaxed">Wearable UGC accessories and props designed for Roblox catalog groups.</p></div></div>
+<div class="group relative bg-[#0c090c] border border-red-950/60 hover:border-red-600/60 rounded-xl overflow-hidden p-6 flex flex-col gap-4 transition-all duration-300 crimson-glow-hover"><button type="button" class="card-remove-btn" style="display:none;position:absolute;top:8px;right:8px;z-index:30;width:26px;height:26px;border-radius:9999px;background:rgba(0,0,0,0.85);border:1px solid #b91c1c;align-items:center;justify-content:center;color:#f87171;cursor:pointer;" aria-label="Remove category" title="Remove category"><span class="material-symbols-outlined" style="font-size:15px;">close</span></button><div class="category-preview absolute inset-0 z-0 pointer-events-none"></div><div class="relative z-10 flex flex-col gap-4"><div class="flex items-center justify-between"><span class="font-label-mono text-[11px] text-red-400/80 uppercase tracking-widest">04</span><span class="material-symbols-outlined text-[16px] text-zinc-500 group-hover:text-red-400 group-hover:translate-x-1 transition-all">north_east</span></div><h4 class="font-headline-sm text-lg text-[#f4f4f5] font-bold uppercase tracking-wider group-hover:text-red-400 transition-colors">Weapon · UGC</h4><p class="font-body-md text-zinc-400 text-sm font-light leading-relaxed">Stylized weapon props built for horror and combat-themed Roblox groups.</p></div></div>
+<div class="group relative bg-[#0c090c] border border-red-950/60 hover:border-red-600/60 rounded-xl overflow-hidden p-6 flex flex-col gap-4 transition-all duration-300 crimson-glow-hover"><button type="button" class="card-remove-btn" style="display:none;position:absolute;top:8px;right:8px;z-index:30;width:26px;height:26px;border-radius:9999px;background:rgba(0,0,0,0.85);border:1px solid #b91c1c;align-items:center;justify-content:center;color:#f87171;cursor:pointer;" aria-label="Remove category" title="Remove category"><span class="material-symbols-outlined" style="font-size:15px;">close</span></button><div class="category-preview absolute inset-0 z-0 pointer-events-none"></div><div class="relative z-10 flex flex-col gap-4"><div class="flex items-center justify-between"><span class="font-label-mono text-[11px] text-red-400/80 uppercase tracking-widest">05</span><span class="material-symbols-outlined text-[16px] text-zinc-500 group-hover:text-red-400 group-hover:translate-x-1 transition-all">north_east</span></div><h4 class="font-headline-sm text-lg text-[#f4f4f5] font-bold uppercase tracking-wider group-hover:text-red-400 transition-colors">Anime Comms</h4><p class="font-body-md text-zinc-400 text-sm font-light leading-relaxed">Character head and hair commissions inspired by anime references.</p></div></div>
+<div class="group relative bg-[#0c090c] border border-red-950/60 hover:border-red-600/60 rounded-xl overflow-hidden p-6 flex flex-col gap-4 transition-all duration-300 crimson-glow-hover"><button type="button" class="card-remove-btn" style="display:none;position:absolute;top:8px;right:8px;z-index:30;width:26px;height:26px;border-radius:9999px;background:rgba(0,0,0,0.85);border:1px solid #b91c1c;align-items:center;justify-content:center;color:#f87171;cursor:pointer;" aria-label="Remove category" title="Remove category"><span class="material-symbols-outlined" style="font-size:15px;">close</span></button><div class="category-preview absolute inset-0 z-0 pointer-events-none"></div><div class="relative z-10 flex flex-col gap-4"><div class="flex items-center justify-between"><span class="font-label-mono text-[11px] text-red-400/80 uppercase tracking-widest">06</span><span class="material-symbols-outlined text-[16px] text-zinc-500 group-hover:text-red-400 group-hover:translate-x-1 transition-all">north_east</span></div><h4 class="font-headline-sm text-lg text-[#f4f4f5] font-bold uppercase tracking-wider group-hover:text-red-400 transition-colors">Back Accessories</h4><p class="font-body-md text-zinc-400 text-sm font-light leading-relaxed">Back-slot UGC accessories, from seasonal props to wearable set pieces.</p></div></div>
+<div class="group relative bg-[#0c090c] border border-red-950/60 hover:border-red-600/60 rounded-xl overflow-hidden p-6 flex flex-col gap-4 transition-all duration-300 crimson-glow-hover"><button type="button" class="card-remove-btn" style="display:none;position:absolute;top:8px;right:8px;z-index:30;width:26px;height:26px;border-radius:9999px;background:rgba(0,0,0,0.85);border:1px solid #b91c1c;align-items:center;justify-content:center;color:#f87171;cursor:pointer;" aria-label="Remove category" title="Remove category"><span class="material-symbols-outlined" style="font-size:15px;">close</span></button><div class="category-preview absolute inset-0 z-0 pointer-events-none"></div><div class="relative z-10 flex flex-col gap-4"><div class="flex items-center justify-between"><span class="font-label-mono text-[11px] text-red-400/80 uppercase tracking-widest">07</span><span class="material-symbols-outlined text-[16px] text-zinc-500 group-hover:text-red-400 group-hover:translate-x-1 transition-all">north_east</span></div><h4 class="font-headline-sm text-lg text-[#f4f4f5] font-bold uppercase tracking-wider group-hover:text-red-400 transition-colors">Dynamic Head</h4><p class="font-body-md text-zinc-400 text-sm font-light leading-relaxed">Animated dynamic head assets with expressive, rigged facial motion.</p></div></div>
 <button type="button" id="add-category-tile" style="display:none" class="border-2 border-dashed border-red-950/70 hover:border-red-600 rounded-xl flex flex-col items-center justify-center gap-2 p-4 min-h-[160px] text-zinc-500 hover:text-red-400 transition-colors bg-[#0a0709]/60">
 <span class="material-symbols-outlined text-3xl">add_circle</span>
 <span class="font-label-mono text-xs uppercase tracking-widest">Add Category</span>
@@ -348,7 +365,7 @@
 </div>
 </section>
 <!-- CURATED CASE STUDIES (MAJOR WORKS) -->
-<section class="w-full px-margin-mobile md:px-8 lg:px-margin py-24" id="featured-work"><div class="max-w-7xl mx-auto flex flex-col gap-10"><div class="flex flex-col gap-3 pb-6 border-b border-red-950/60"><div><span class="inline-block px-3 py-1 rounded border border-red-900/50 bg-[#12080a] text-red-400 font-label-mono text-[11px] tracking-[0.2em] uppercase">[ SHOWCASE ]</span></div><h2 class="font-headline-lg text-3xl sm:text-5xl text-[#f4f4f5] font-normal tracking-tight mt-1">Selected Portfolio</h2><p class="font-body-md text-zinc-400 text-sm sm:text-base font-light max-w-3xl leading-relaxed">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor.</p></div><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"><div class="group relative bg-[#0c090c] border border-red-950/60 hover:border-red-600/60 rounded-xl overflow-hidden p-5 flex flex-col justify-between transition-all duration-300 crimson-glow-hover"><div class="flex items-center justify-between pb-3"><span class="font-label-mono text-[10px] text-zinc-500 uppercase tracking-widest">[ SELECTED ]</span><span class="font-label-mono text-[10px] text-red-400/80 uppercase">01 // 06</span></div><div class="w-full aspect-square relative my-3 overflow-hidden rounded-lg bg-black/40 flex items-center justify-center"><img src="assets/placeholder-thumbnail.svg" alt="LOREM IPSUM" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"></div><div class="pt-4 border-t border-red-950/40 flex flex-col gap-1"><span class="font-label-mono text-[10px] text-zinc-500 tracking-wider uppercase">OPEN DETAILS</span><div class="flex items-center justify-between"><h4 class="font-headline-sm text-base text-[#f4f4f5] font-bold uppercase tracking-wider group-hover:text-red-400 transition-colors">LOREM IPSUM</h4><span class="material-symbols-outlined text-[16px] text-zinc-500 group-hover:text-red-400 group-hover:translate-x-1 transition-all">north_east</span></div></div></div><div class="group relative bg-[#0c090c] border border-red-950/60 hover:border-red-600/60 rounded-xl overflow-hidden p-5 flex flex-col justify-between transition-all duration-300 crimson-glow-hover"><div class="flex items-center justify-between pb-3"><span class="font-label-mono text-[10px] text-zinc-500 uppercase tracking-widest">[ SELECTED ]</span><span class="font-label-mono text-[10px] text-red-400/80 uppercase">02 // 06</span></div><div class="w-full aspect-square relative my-3 overflow-hidden rounded-lg bg-black/40 flex items-center justify-center"><img src="assets/placeholder-thumbnail.svg" alt="VOID REAPER FLAIL" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"></div><div class="pt-4 border-t border-red-950/40 flex flex-col gap-1"><span class="font-label-mono text-[10px] text-zinc-500 tracking-wider uppercase">OPEN DETAILS</span><div class="flex items-center justify-between"><h4 class="font-headline-sm text-base text-[#f4f4f5] font-bold uppercase tracking-wider group-hover:text-red-400 transition-colors">LOREM IPSUM</h4><span class="material-symbols-outlined text-[16px] text-zinc-500 group-hover:text-red-400 group-hover:translate-x-1 transition-all">north_east</span></div></div></div><div class="group relative bg-[#0c090c] border border-red-950/60 hover:border-red-600/60 rounded-xl overflow-hidden p-5 flex flex-col justify-between transition-all duration-300 crimson-glow-hover"><div class="flex items-center justify-between pb-3"><span class="font-label-mono text-[10px] text-zinc-500 uppercase tracking-widest">[ SELECTED ]</span><span class="font-label-mono text-[10px] text-red-400/80 uppercase">03 // 06</span></div><div class="w-full aspect-square relative my-3 overflow-hidden rounded-lg bg-black/40 flex items-center justify-center"><img src="assets/placeholder-thumbnail.svg" alt="LOREM IPSUM" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"></div><div class="pt-4 border-t border-red-950/40 flex flex-col gap-1"><span class="font-label-mono text-[10px] text-zinc-500 tracking-wider uppercase">OPEN DETAILS</span><div class="flex items-center justify-between"><h4 class="font-headline-sm text-base text-[#f4f4f5] font-bold uppercase tracking-wider group-hover:text-red-400 transition-colors">LOREM IPSUM</h4><span class="material-symbols-outlined text-[16px] text-zinc-500 group-hover:text-red-400 group-hover:translate-x-1 transition-all">north_east</span></div></div></div><div class="group relative bg-[#0c090c] border border-red-950/60 hover:border-red-600/60 rounded-xl overflow-hidden p-5 flex flex-col justify-between transition-all duration-300 crimson-glow-hover"><div class="flex items-center justify-between pb-3"><span class="font-label-mono text-[10px] text-zinc-500 uppercase tracking-widest">[ SELECTED ]</span><span class="font-label-mono text-[10px] text-red-400/80 uppercase">04 // 06</span></div><div class="w-full aspect-square relative my-3 overflow-hidden rounded-lg bg-black/40 flex items-center justify-center"><img src="assets/placeholder-thumbnail.svg" alt="LOREM IPSUM" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"></div><div class="pt-4 border-t border-red-950/40 flex flex-col gap-1"><span class="font-label-mono text-[10px] text-zinc-500 tracking-wider uppercase">OPEN DETAILS</span><div class="flex items-center justify-between"><h4 class="font-headline-sm text-base text-[#f4f4f5] font-bold uppercase tracking-wider group-hover:text-red-400 transition-colors">LOREM IPSUM</h4><span class="material-symbols-outlined text-[16px] text-zinc-500 group-hover:text-red-400 group-hover:translate-x-1 transition-all">north_east</span></div></div></div><div class="group relative bg-[#0c090c] border border-red-950/60 hover:border-red-600/60 rounded-xl overflow-hidden p-5 flex flex-col justify-between transition-all duration-300 crimson-glow-hover"><div class="flex items-center justify-between pb-3"><span class="font-label-mono text-[10px] text-zinc-500 uppercase tracking-widest">[ SELECTED ]</span><span class="font-label-mono text-[10px] text-red-400/80 uppercase">05 // 06</span></div><div class="w-full aspect-square relative my-3 overflow-hidden rounded-lg bg-black/40 flex items-center justify-center"><img src="assets/placeholder-thumbnail.svg" alt="LOREM IPSUM" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"></div><div class="pt-4 border-t border-red-950/40 flex flex-col gap-1"><span class="font-label-mono text-[10px] text-zinc-500 tracking-wider uppercase">OPEN DETAILS</span><div class="flex items-center justify-between"><h4 class="font-headline-sm text-base text-[#f4f4f5] font-bold uppercase tracking-wider group-hover:text-red-400 transition-colors">LOREM IPSUM</h4><span class="material-symbols-outlined text-[16px] text-zinc-500 group-hover:text-red-400 group-hover:translate-x-1 transition-all">north_east</span></div></div></div><div class="group relative bg-[#0c090c] border border-red-950/60 hover:border-red-600/60 rounded-xl overflow-hidden p-5 flex flex-col justify-between transition-all duration-300 crimson-glow-hover"><div class="flex items-center justify-between pb-3"><span class="font-label-mono text-[10px] text-zinc-500 uppercase tracking-widest">[ SELECTED ]</span><span class="font-label-mono text-[10px] text-red-400/80 uppercase">06 // 06</span></div><div class="w-full aspect-square relative my-3 overflow-hidden rounded-lg bg-black/40 flex items-center justify-center"><img src="assets/placeholder-thumbnail.svg" alt="ELDRITCH CODEX TOME" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"></div><div class="pt-4 border-t border-red-950/40 flex flex-col gap-1"><span class="font-label-mono text-[10px] text-zinc-500 tracking-wider uppercase">OPEN DETAILS</span><div class="flex items-center justify-between"><h4 class="font-headline-sm text-base text-[#f4f4f5] font-bold uppercase tracking-wider group-hover:text-red-400 transition-colors">LOREM IPSUM</h4><span class="material-symbols-outlined text-[16px] text-zinc-500 group-hover:text-red-400 group-hover:translate-x-1 transition-all">north_east</span></div></div></div></div></div></section>
+<section class="w-full px-margin-mobile md:px-8 lg:px-margin py-24" id="featured-work"><div class="max-w-7xl mx-auto flex flex-col gap-10"><div class="flex flex-col gap-3 pb-6 border-b border-red-950/60"><div><span class="inline-block px-3 py-1 rounded border border-red-900/50 bg-[#12080a] text-red-400 font-label-mono text-[11px] tracking-[0.2em] uppercase">[ SHOWCASE ]</span></div><h2 class="font-headline-lg text-3xl sm:text-5xl text-[#f4f4f5] font-normal tracking-tight mt-1">Selected Portfolio</h2><p class="font-body-md text-zinc-400 text-sm sm:text-base font-light max-w-3xl leading-relaxed">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor.</p></div><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="featured-work-grid"><div class="group relative bg-[#0c090c] border border-red-950/60 hover:border-red-600/60 rounded-xl overflow-hidden p-5 flex flex-col justify-between transition-all duration-300 crimson-glow-hover"><button type="button" class="card-remove-btn" style="display:none;position:absolute;top:8px;right:8px;z-index:30;width:26px;height:26px;border-radius:9999px;background:rgba(0,0,0,0.85);border:1px solid #b91c1c;align-items:center;justify-content:center;color:#f87171;cursor:pointer;" aria-label="Remove card" title="Remove card"><span class="material-symbols-outlined" style="font-size:15px;">close</span></button><div class="flex items-center justify-between pb-3"><span class="font-label-mono text-[10px] text-zinc-500 uppercase tracking-widest">[ SELECTED ]</span><span class="font-label-mono text-[10px] text-red-400/80 uppercase">01 // 06</span></div><div class="img-stage w-full aspect-square relative my-3 overflow-hidden rounded-lg bg-black/40 flex items-center justify-center"><img src="assets/works/serpent-executioner-main.png" alt="Serpent Executioner" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"></div><div class="pt-4 border-t border-red-950/40 flex flex-col gap-1"><span class="card-category-label font-label-mono text-[10px] text-zinc-500 tracking-wider uppercase">Weapon · UGC</span><div class="flex items-center justify-between"><h4 class="font-headline-sm text-base text-[#f4f4f5] font-bold uppercase tracking-wider group-hover:text-red-400 transition-colors">Serpent Executioner</h4><span class="material-symbols-outlined text-[16px] text-zinc-500 group-hover:text-red-400 group-hover:translate-x-1 transition-all">north_east</span></div><p class="font-body-md text-zinc-400 text-sm font-light leading-relaxed mt-1">Created for a horror-theme Roblox group — a stylized serpent-motif executioner blade.</p><div class="card-tags flex flex-wrap items-center gap-1.5 mt-2"><span class="card-tag" style="display:inline-flex;align-items:center;gap:4px;border:1px solid #7f1d1d;background:#150a0d;color:#fca5a5;font-family:ui-monospace,monospace;font-size:10px;border-radius:9999px;padding:2px 4px 2px 8px;"><span class="card-tag-label">#Blender</span><button type="button" class="card-tag-remove builder-only-control" data-show-display="inline-flex" style="display:none;align-items:center;justify-content:center;width:12px;height:12px;border:none;background:transparent;color:#fca5a5;cursor:pointer;padding:0;font-size:12px;line-height:1;">×</button></span><span class="card-tag" style="display:inline-flex;align-items:center;gap:4px;border:1px solid #7f1d1d;background:#150a0d;color:#fca5a5;font-family:ui-monospace,monospace;font-size:10px;border-radius:9999px;padding:2px 4px 2px 8px;"><span class="card-tag-label">#SubstancePainter</span><button type="button" class="card-tag-remove builder-only-control" data-show-display="inline-flex" style="display:none;align-items:center;justify-content:center;width:12px;height:12px;border:none;background:transparent;color:#fca5a5;cursor:pointer;padding:0;font-size:12px;line-height:1;">×</button></span></div><div class="card-gallery-data" style="display:none"><img src="assets/works/serpent-executioner-01.png" alt="Gallery image"></div></div></div><div class="group relative bg-[#0c090c] border border-red-950/60 hover:border-red-600/60 rounded-xl overflow-hidden p-5 flex flex-col justify-between transition-all duration-300 crimson-glow-hover"><button type="button" class="card-remove-btn" style="display:none;position:absolute;top:8px;right:8px;z-index:30;width:26px;height:26px;border-radius:9999px;background:rgba(0,0,0,0.85);border:1px solid #b91c1c;align-items:center;justify-content:center;color:#f87171;cursor:pointer;" aria-label="Remove card" title="Remove card"><span class="material-symbols-outlined" style="font-size:15px;">close</span></button><div class="flex items-center justify-between pb-3"><span class="font-label-mono text-[10px] text-zinc-500 uppercase tracking-widest">[ SELECTED ]</span><span class="font-label-mono text-[10px] text-red-400/80 uppercase">02 // 06</span></div><div class="img-stage w-full aspect-square relative my-3 overflow-hidden rounded-lg bg-black/40 flex items-center justify-center"><img src="assets/works/vkei-hair-main.png" alt="VKEI Hair" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"></div><div class="pt-4 border-t border-red-950/40 flex flex-col gap-1"><span class="card-category-label font-label-mono text-[10px] text-zinc-500 tracking-wider uppercase">Male Hair</span><div class="flex items-center justify-between"><h4 class="font-headline-sm text-base text-[#f4f4f5] font-bold uppercase tracking-wider group-hover:text-red-400 transition-colors">VKEI Hair</h4><span class="material-symbols-outlined text-[16px] text-zinc-500 group-hover:text-red-400 group-hover:translate-x-1 transition-all">north_east</span></div><p class="font-body-md text-zinc-400 text-sm font-light leading-relaxed mt-1">Visual-kei inspired male hairstyle, sculpted and textured for a Roblox UGC group.</p><div class="card-tags flex flex-wrap items-center gap-1.5 mt-2"><span class="card-tag" style="display:inline-flex;align-items:center;gap:4px;border:1px solid #7f1d1d;background:#150a0d;color:#fca5a5;font-family:ui-monospace,monospace;font-size:10px;border-radius:9999px;padding:2px 4px 2px 8px;"><span class="card-tag-label">#Blender</span><button type="button" class="card-tag-remove builder-only-control" data-show-display="inline-flex" style="display:none;align-items:center;justify-content:center;width:12px;height:12px;border:none;background:transparent;color:#fca5a5;cursor:pointer;padding:0;font-size:12px;line-height:1;">×</button></span><span class="card-tag" style="display:inline-flex;align-items:center;gap:4px;border:1px solid #7f1d1d;background:#150a0d;color:#fca5a5;font-family:ui-monospace,monospace;font-size:10px;border-radius:9999px;padding:2px 4px 2px 8px;"><span class="card-tag-label">#SubstancePainter</span><button type="button" class="card-tag-remove builder-only-control" data-show-display="inline-flex" style="display:none;align-items:center;justify-content:center;width:12px;height:12px;border:none;background:transparent;color:#fca5a5;cursor:pointer;padding:0;font-size:12px;line-height:1;">×</button></span></div><div class="card-gallery-data" style="display:none"><img src="assets/works/vkei-hair-01.png" alt="Gallery image"></div></div></div><div class="group relative bg-[#0c090c] border border-red-950/60 hover:border-red-600/60 rounded-xl overflow-hidden p-5 flex flex-col justify-between transition-all duration-300 crimson-glow-hover"><button type="button" class="card-remove-btn" style="display:none;position:absolute;top:8px;right:8px;z-index:30;width:26px;height:26px;border-radius:9999px;background:rgba(0,0,0,0.85);border:1px solid #b91c1c;align-items:center;justify-content:center;color:#f87171;cursor:pointer;" aria-label="Remove card" title="Remove card"><span class="material-symbols-outlined" style="font-size:15px;">close</span></button><div class="flex items-center justify-between pb-3"><span class="font-label-mono text-[10px] text-zinc-500 uppercase tracking-widest">[ SELECTED ]</span><span class="font-label-mono text-[10px] text-red-400/80 uppercase">03 // 06</span></div><div class="img-stage w-full aspect-square relative my-3 overflow-hidden rounded-lg bg-black/40 flex items-center justify-center"><img src="assets/works/vkei-girl-hair-main.png" alt="Vkei Girl Hair" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"></div><div class="pt-4 border-t border-red-950/40 flex flex-col gap-1"><span class="card-category-label font-label-mono text-[10px] text-zinc-500 tracking-wider uppercase">Girl Hair</span><div class="flex items-center justify-between"><h4 class="font-headline-sm text-base text-[#f4f4f5] font-bold uppercase tracking-wider group-hover:text-red-400 transition-colors">Vkei Girl Hair</h4><span class="material-symbols-outlined text-[16px] text-zinc-500 group-hover:text-red-400 group-hover:translate-x-1 transition-all">north_east</span></div><p class="font-body-md text-zinc-400 text-sm font-light leading-relaxed mt-1">Layered visual-kei hairstyle designed for feminine avatar presets.</p><div class="card-tags flex flex-wrap items-center gap-1.5 mt-2"><span class="card-tag" style="display:inline-flex;align-items:center;gap:4px;border:1px solid #7f1d1d;background:#150a0d;color:#fca5a5;font-family:ui-monospace,monospace;font-size:10px;border-radius:9999px;padding:2px 4px 2px 8px;"><span class="card-tag-label">#Blender</span><button type="button" class="card-tag-remove builder-only-control" data-show-display="inline-flex" style="display:none;align-items:center;justify-content:center;width:12px;height:12px;border:none;background:transparent;color:#fca5a5;cursor:pointer;padding:0;font-size:12px;line-height:1;">×</button></span><span class="card-tag" style="display:inline-flex;align-items:center;gap:4px;border:1px solid #7f1d1d;background:#150a0d;color:#fca5a5;font-family:ui-monospace,monospace;font-size:10px;border-radius:9999px;padding:2px 4px 2px 8px;"><span class="card-tag-label">#SubstancePainter</span><button type="button" class="card-tag-remove builder-only-control" data-show-display="inline-flex" style="display:none;align-items:center;justify-content:center;width:12px;height:12px;border:none;background:transparent;color:#fca5a5;cursor:pointer;padding:0;font-size:12px;line-height:1;">×</button></span></div><div class="card-gallery-data" style="display:none"></div></div></div><div class="group relative bg-[#0c090c] border border-red-950/60 hover:border-red-600/60 rounded-xl overflow-hidden p-5 flex flex-col justify-between transition-all duration-300 crimson-glow-hover"><button type="button" class="card-remove-btn" style="display:none;position:absolute;top:8px;right:8px;z-index:30;width:26px;height:26px;border-radius:9999px;background:rgba(0,0,0,0.85);border:1px solid #b91c1c;align-items:center;justify-content:center;color:#f87171;cursor:pointer;" aria-label="Remove card" title="Remove card"><span class="material-symbols-outlined" style="font-size:15px;">close</span></button><div class="flex items-center justify-between pb-3"><span class="font-label-mono text-[10px] text-zinc-500 uppercase tracking-widest">[ SELECTED ]</span><span class="font-label-mono text-[10px] text-red-400/80 uppercase">04 // 06</span></div><div class="img-stage w-full aspect-square relative my-3 overflow-hidden rounded-lg bg-black/40 flex items-center justify-center"><img src="assets/works/gojo-satoru-set-main.png" alt="Gojo Satoru Set" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"></div><div class="pt-4 border-t border-red-950/40 flex flex-col gap-1"><span class="card-category-label font-label-mono text-[10px] text-zinc-500 tracking-wider uppercase">Anime Comms</span><div class="flex items-center justify-between"><h4 class="font-headline-sm text-base text-[#f4f4f5] font-bold uppercase tracking-wider group-hover:text-red-400 transition-colors">Gojo Satoru Set</h4><span class="material-symbols-outlined text-[16px] text-zinc-500 group-hover:text-red-400 group-hover:translate-x-1 transition-all">north_east</span></div><p class="font-body-md text-zinc-400 text-sm font-light leading-relaxed mt-1">Anime-inspired head and hair commission set, based on the Gojo Satoru likeness.</p><div class="card-tags flex flex-wrap items-center gap-1.5 mt-2"><span class="card-tag" style="display:inline-flex;align-items:center;gap:4px;border:1px solid #7f1d1d;background:#150a0d;color:#fca5a5;font-family:ui-monospace,monospace;font-size:10px;border-radius:9999px;padding:2px 4px 2px 8px;"><span class="card-tag-label">#Blender</span><button type="button" class="card-tag-remove builder-only-control" data-show-display="inline-flex" style="display:none;align-items:center;justify-content:center;width:12px;height:12px;border:none;background:transparent;color:#fca5a5;cursor:pointer;padding:0;font-size:12px;line-height:1;">×</button></span><span class="card-tag" style="display:inline-flex;align-items:center;gap:4px;border:1px solid #7f1d1d;background:#150a0d;color:#fca5a5;font-family:ui-monospace,monospace;font-size:10px;border-radius:9999px;padding:2px 4px 2px 8px;"><span class="card-tag-label">#SubstancePainter</span><button type="button" class="card-tag-remove builder-only-control" data-show-display="inline-flex" style="display:none;align-items:center;justify-content:center;width:12px;height:12px;border:none;background:transparent;color:#fca5a5;cursor:pointer;padding:0;font-size:12px;line-height:1;">×</button></span></div><div class="card-gallery-data" style="display:none"><img src="assets/works/gojo-satoru-set-01.png" alt="Gallery image"></div></div></div><div class="group relative bg-[#0c090c] border border-red-950/60 hover:border-red-600/60 rounded-xl overflow-hidden p-5 flex flex-col justify-between transition-all duration-300 crimson-glow-hover"><button type="button" class="card-remove-btn" style="display:none;position:absolute;top:8px;right:8px;z-index:30;width:26px;height:26px;border-radius:9999px;background:rgba(0,0,0,0.85);border:1px solid #b91c1c;align-items:center;justify-content:center;color:#f87171;cursor:pointer;" aria-label="Remove card" title="Remove card"><span class="material-symbols-outlined" style="font-size:15px;">close</span></button><div class="flex items-center justify-between pb-3"><span class="font-label-mono text-[10px] text-zinc-500 uppercase tracking-widest">[ SELECTED ]</span><span class="font-label-mono text-[10px] text-red-400/80 uppercase">05 // 06</span></div><div class="img-stage w-full aspect-square relative my-3 overflow-hidden rounded-lg bg-black/40 flex items-center justify-center"><img src="assets/works/black-skeleton-clock-main.png" alt="Black Skeleton Clock" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"></div><div class="pt-4 border-t border-red-950/40 flex flex-col gap-1"><span class="card-category-label font-label-mono text-[10px] text-zinc-500 tracking-wider uppercase">Back Accessories</span><div class="flex items-center justify-between"><h4 class="font-headline-sm text-base text-[#f4f4f5] font-bold uppercase tracking-wider group-hover:text-red-400 transition-colors">Black Skeleton Clock</h4><span class="material-symbols-outlined text-[16px] text-zinc-500 group-hover:text-red-400 group-hover:translate-x-1 transition-all">north_east</span></div><p class="font-body-md text-zinc-400 text-sm font-light leading-relaxed mt-1">Gothic skeleton-clock back accessory, built for a Roblox UGC catalog drop.</p><div class="card-tags flex flex-wrap items-center gap-1.5 mt-2"><span class="card-tag" style="display:inline-flex;align-items:center;gap:4px;border:1px solid #7f1d1d;background:#150a0d;color:#fca5a5;font-family:ui-monospace,monospace;font-size:10px;border-radius:9999px;padding:2px 4px 2px 8px;"><span class="card-tag-label">#Blender</span><button type="button" class="card-tag-remove builder-only-control" data-show-display="inline-flex" style="display:none;align-items:center;justify-content:center;width:12px;height:12px;border:none;background:transparent;color:#fca5a5;cursor:pointer;padding:0;font-size:12px;line-height:1;">×</button></span><span class="card-tag" style="display:inline-flex;align-items:center;gap:4px;border:1px solid #7f1d1d;background:#150a0d;color:#fca5a5;font-family:ui-monospace,monospace;font-size:10px;border-radius:9999px;padding:2px 4px 2px 8px;"><span class="card-tag-label">#SubstancePainter</span><button type="button" class="card-tag-remove builder-only-control" data-show-display="inline-flex" style="display:none;align-items:center;justify-content:center;width:12px;height:12px;border:none;background:transparent;color:#fca5a5;cursor:pointer;padding:0;font-size:12px;line-height:1;">×</button></span></div><div class="card-gallery-data" style="display:none"><img src="assets/works/black-skeleton-clock-01.png" alt="Gallery image"></div></div></div><div class="group relative bg-[#0c090c] border border-red-950/60 hover:border-red-600/60 rounded-xl overflow-hidden p-5 flex flex-col justify-between transition-all duration-300 crimson-glow-hover"><button type="button" class="card-remove-btn" style="display:none;position:absolute;top:8px;right:8px;z-index:30;width:26px;height:26px;border-radius:9999px;background:rgba(0,0,0,0.85);border:1px solid #b91c1c;align-items:center;justify-content:center;color:#f87171;cursor:pointer;" aria-label="Remove card" title="Remove card"><span class="material-symbols-outlined" style="font-size:15px;">close</span></button><div class="flex items-center justify-between pb-3"><span class="font-label-mono text-[10px] text-zinc-500 uppercase tracking-widest">[ SELECTED ]</span><span class="font-label-mono text-[10px] text-red-400/80 uppercase">06 // 06</span></div><div class="img-stage w-full aspect-square relative my-3 overflow-hidden rounded-lg bg-black/40 flex items-center justify-center"><img src="assets/works/nana-dynamic-head-main.png" alt="NaNa Dynamic Head" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"></div><div class="pt-4 border-t border-red-950/40 flex flex-col gap-1"><span class="card-category-label font-label-mono text-[10px] text-zinc-500 tracking-wider uppercase">Dynamic Head</span><div class="flex items-center justify-between"><h4 class="font-headline-sm text-base text-[#f4f4f5] font-bold uppercase tracking-wider group-hover:text-red-400 transition-colors">NaNa Dynamic Head</h4><span class="material-symbols-outlined text-[16px] text-zinc-500 group-hover:text-red-400 group-hover:translate-x-1 transition-all">north_east</span></div><p class="font-body-md text-zinc-400 text-sm font-light leading-relaxed mt-1">Rigged dynamic head with expressive animated facial motion.</p><div class="card-tags flex flex-wrap items-center gap-1.5 mt-2"><span class="card-tag" style="display:inline-flex;align-items:center;gap:4px;border:1px solid #7f1d1d;background:#150a0d;color:#fca5a5;font-family:ui-monospace,monospace;font-size:10px;border-radius:9999px;padding:2px 4px 2px 8px;"><span class="card-tag-label">#Blender</span><button type="button" class="card-tag-remove builder-only-control" data-show-display="inline-flex" style="display:none;align-items:center;justify-content:center;width:12px;height:12px;border:none;background:transparent;color:#fca5a5;cursor:pointer;padding:0;font-size:12px;line-height:1;">×</button></span><span class="card-tag" style="display:inline-flex;align-items:center;gap:4px;border:1px solid #7f1d1d;background:#150a0d;color:#fca5a5;font-family:ui-monospace,monospace;font-size:10px;border-radius:9999px;padding:2px 4px 2px 8px;"><span class="card-tag-label">#SubstancePainter</span><button type="button" class="card-tag-remove builder-only-control" data-show-display="inline-flex" style="display:none;align-items:center;justify-content:center;width:12px;height:12px;border:none;background:transparent;color:#fca5a5;cursor:pointer;padding:0;font-size:12px;line-height:1;">×</button></span></div><div class="card-gallery-data" style="display:none"><img src="assets/works/nana-dynamic-head-01.png" alt="Gallery image"></div></div></div><button type="button" id="add-showcase-tile" style="display:none" class="border-2 border-dashed border-red-950/70 hover:border-red-600 rounded-xl flex flex-col items-center justify-center gap-2 p-4 min-h-[280px] text-zinc-500 hover:text-red-400 transition-colors bg-[#0a0709]/60"><span class="material-symbols-outlined text-3xl">add_circle</span><span class="font-label-mono text-xs uppercase tracking-widest">Add New Work</span></button></div></div></section>
 <!-- SELECTED WORKS INDEX / CURATED GRIM ROSTER -->
 <section class="w-full px-margin-mobile md:px-8 lg:px-margin py-20 bg-[#080609] border-t border-red-950/60" id="all-works">
   <div class="max-w-7xl mx-auto flex flex-col gap-10">
@@ -374,213 +391,18 @@
     </div>
 
     <!-- Filter Tabs Bar -->
-    <div class="flex flex-wrap items-center gap-2 sm:gap-3">
-      <button id="all-works-count-tab" class="px-4 py-2 rounded text-xs font-label-mono uppercase tracking-widest bg-[#150a0d] border border-red-600 text-white shadow-[0_0_15px_rgba(225,29,72,0.3)] transition-all cursor-pointer">
-        [ ALL (16) ]
-      </button>
-      <button class="px-4 py-2 rounded text-xs font-label-mono uppercase tracking-widest bg-[#0d0a0d] border border-red-950/60 text-zinc-400 hover:text-red-300 hover:border-red-900/80 transition-all cursor-pointer">
-        [ MELEE WEAPONS ]
-      </button>
-      <button class="px-4 py-2 rounded text-xs font-label-mono uppercase tracking-widest bg-[#0d0a0d] border border-red-950/60 text-zinc-400 hover:text-red-300 hover:border-red-900/80 transition-all cursor-pointer">
-        [ RANGED &amp; FIREARMS ]
-      </button>
-      <button class="px-4 py-2 rounded text-xs font-label-mono uppercase tracking-widest bg-[#0d0a0d] border border-red-950/60 text-zinc-400 hover:text-red-300 hover:border-red-900/80 transition-all cursor-pointer">
-        [ ARMOR &amp; HELMETS ]
-      </button>
-      <button class="px-4 py-2 rounded text-xs font-label-mono uppercase tracking-widest bg-[#0d0a0d] border border-red-950/60 text-zinc-400 hover:text-red-300 hover:border-red-900/80 transition-all cursor-pointer">
-        [ ELDRITCH ARTIFACTS ]
-      </button>
-      <button class="px-4 py-2 rounded text-xs font-label-mono uppercase tracking-widest bg-[#0d0a0d] border border-red-950/60 text-zinc-400 hover:text-red-300 hover:border-red-900/80 transition-all cursor-pointer">
-        [ PROTOTYPES ]
-      </button>
-    </div>
+    <div class="flex flex-wrap items-center gap-2 sm:gap-3" id="filter-tabs-bar"></div>
 
     <!-- 8-Card Responsive Vault Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-      <!-- Asset 1: Lorem Ipsum Dolor -->
-      <div class="group relative bg-[#0c090c] border border-red-950/60 hover:border-red-600/70 rounded-xl overflow-hidden p-4 flex flex-col justify-between transition-all duration-300 crimson-glow-hover"><button type="button" class="card-remove-btn" style="display:none;position:absolute;top:8px;right:8px;z-index:30;width:26px;height:26px;border-radius:9999px;background:rgba(0,0,0,0.85);border:1px solid #b91c1c;align-items:center;justify-content:center;color:#f87171;cursor:pointer;" aria-label="Remove card" title="Remove card"><span class="material-symbols-outlined" style="font-size:15px;">close</span></button>
-        <div>
-          <div class="flex items-center justify-between pb-2.5">
-            <span class="font-label-mono text-[9px] text-zinc-500 uppercase tracking-widest">MELEE // 2025</span>
-            <span class="font-label-mono text-[9px] text-red-400 uppercase bg-[#150a0d] border border-red-950 px-2 py-0.5 rounded">RELEASED</span>
-          </div>
-          <div class="w-full aspect-square relative my-2 overflow-hidden rounded-lg bg-black/50 flex items-center justify-center border border-red-950/40">
-            <img src="assets/placeholder-thumbnail.svg" alt="Lorem Ipsum Dolor" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-          </div>
-          <h4 class="font-headline-sm text-sm text-[#f4f4f5] font-bold uppercase tracking-wider group-hover:text-red-400 transition-colors mt-2">
-            Lorem Ipsum
-          </h4>
-          <p class="font-body-md text-zinc-400 text-xs mt-1 font-light">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-          </p>
-        </div>
-        <div class="pt-3 mt-3 border-t border-red-950/40 flex items-center justify-between">
-          <span class="font-label-mono text-[10px] text-zinc-500 uppercase">42k Tris // 4K PBR</span>
-          <span class="material-symbols-outlined text-[16px] text-zinc-500 group-hover:text-red-400 group-hover:translate-x-1 transition-all">north_east</span>
-        </div>
-      </div>
-
-      <!-- Asset 2: Void Reaper Flail -->
-      <div class="group relative bg-[#0c090c] border border-red-950/60 hover:border-red-600/70 rounded-xl overflow-hidden p-4 flex flex-col justify-between transition-all duration-300 crimson-glow-hover"><button type="button" class="card-remove-btn" style="display:none;position:absolute;top:8px;right:8px;z-index:30;width:26px;height:26px;border-radius:9999px;background:rgba(0,0,0,0.85);border:1px solid #b91c1c;align-items:center;justify-content:center;color:#f87171;cursor:pointer;" aria-label="Remove card" title="Remove card"><span class="material-symbols-outlined" style="font-size:15px;">close</span></button>
-        <div>
-          <div class="flex items-center justify-between pb-2.5">
-            <span class="font-label-mono text-[9px] text-zinc-500 uppercase tracking-widest">WEAPON // 2025</span>
-            <span class="font-label-mono text-[9px] text-red-400 uppercase bg-[#150a0d] border border-red-950 px-2 py-0.5 rounded">RELEASED</span>
-          </div>
-          <div class="w-full aspect-square relative my-2 overflow-hidden rounded-lg bg-black/50 flex items-center justify-center border border-red-950/40">
-            <img src="assets/placeholder-thumbnail.svg" alt="Lorem Ipsum Dolor" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-          </div>
-          <h4 class="font-headline-sm text-sm text-[#f4f4f5] font-bold uppercase tracking-wider group-hover:text-red-400 transition-colors mt-2">
-            Lorem Ipsum
-          </h4>
-          <p class="font-body-md text-zinc-400 text-xs mt-1 font-light">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-          </p>
-        </div>
-        <div class="pt-3 mt-3 border-t border-red-950/40 flex items-center justify-between">
-          <span class="font-label-mono text-[10px] text-zinc-500 uppercase">28k Tris // 4K PBR</span>
-          <span class="material-symbols-outlined text-[16px] text-zinc-500 group-hover:text-red-400 group-hover:translate-x-1 transition-all">north_east</span>
-        </div>
-      </div>
-
-      <!-- Asset 3: Dragon Scale Bow -->
-      <div class="group relative bg-[#0c090c] border border-red-950/60 hover:border-red-600/70 rounded-xl overflow-hidden p-4 flex flex-col justify-between transition-all duration-300 crimson-glow-hover"><button type="button" class="card-remove-btn" style="display:none;position:absolute;top:8px;right:8px;z-index:30;width:26px;height:26px;border-radius:9999px;background:rgba(0,0,0,0.85);border:1px solid #b91c1c;align-items:center;justify-content:center;color:#f87171;cursor:pointer;" aria-label="Remove card" title="Remove card"><span class="material-symbols-outlined" style="font-size:15px;">close</span></button>
-        <div>
-          <div class="flex items-center justify-between pb-2.5">
-            <span class="font-label-mono text-[9px] text-zinc-500 uppercase tracking-widest">RANGED // 2025</span>
-            <span class="font-label-mono text-[9px] text-red-300 uppercase bg-[#150a0d] border border-red-950 px-2 py-0.5 rounded">COMMISSION</span>
-          </div>
-          <div class="w-full aspect-square relative my-2 overflow-hidden rounded-lg bg-black/50 flex items-center justify-center border border-red-950/40">
-            <img src="assets/placeholder-thumbnail.svg" alt="Lorem Ipsum Dolor" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-          </div>
-          <h4 class="font-headline-sm text-sm text-[#f4f4f5] font-bold uppercase tracking-wider group-hover:text-red-400 transition-colors mt-2">
-            Lorem Ipsum
-          </h4>
-          <p class="font-body-md text-zinc-400 text-xs mt-1 font-light">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-          </p>
-        </div>
-        <div class="pt-3 mt-3 border-t border-red-950/40 flex items-center justify-between">
-          <span class="font-label-mono text-[10px] text-zinc-500 uppercase">36k Tris // 4K PBR</span>
-          <span class="material-symbols-outlined text-[16px] text-zinc-500 group-hover:text-red-400 group-hover:translate-x-1 transition-all">north_east</span>
-        </div>
-      </div>
-
-      <!-- Asset 4: Magical Blunderbuss -->
-      <div class="group relative bg-[#0c090c] border border-red-950/60 hover:border-red-600/70 rounded-xl overflow-hidden p-4 flex flex-col justify-between transition-all duration-300 crimson-glow-hover"><button type="button" class="card-remove-btn" style="display:none;position:absolute;top:8px;right:8px;z-index:30;width:26px;height:26px;border-radius:9999px;background:rgba(0,0,0,0.85);border:1px solid #b91c1c;align-items:center;justify-content:center;color:#f87171;cursor:pointer;" aria-label="Remove card" title="Remove card"><span class="material-symbols-outlined" style="font-size:15px;">close</span></button>
-        <div>
-          <div class="flex items-center justify-between pb-2.5">
-            <span class="font-label-mono text-[9px] text-zinc-500 uppercase tracking-widest">FIREARM // 2024</span>
-            <span class="font-label-mono text-[9px] text-zinc-400 uppercase bg-[#150a0d] border border-red-950 px-2 py-0.5 rounded">ARCHIVED</span>
-          </div>
-          <div class="w-full aspect-square relative my-2 overflow-hidden rounded-lg bg-black/50 flex items-center justify-center border border-red-950/40">
-            <img src="assets/placeholder-thumbnail.svg" alt="Lorem Ipsum Dolor" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-          </div>
-          <h4 class="font-headline-sm text-sm text-[#f4f4f5] font-bold uppercase tracking-wider group-hover:text-red-400 transition-colors mt-2">
-            Lorem Ipsum
-          </h4>
-          <p class="font-body-md text-zinc-400 text-xs mt-1 font-light">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-          </p>
-        </div>
-        <div class="pt-3 mt-3 border-t border-red-950/40 flex items-center justify-between">
-          <span class="font-label-mono text-[10px] text-zinc-500 uppercase">31k Tris // 4K PBR</span>
-          <span class="material-symbols-outlined text-[16px] text-zinc-500 group-hover:text-red-400 group-hover:translate-x-1 transition-all">north_east</span>
-        </div>
-      </div>
-
-      <!-- Asset 5: Demon Knight Helm -->
-      <div class="group relative bg-[#0c090c] border border-red-950/60 hover:border-red-600/70 rounded-xl overflow-hidden p-4 flex flex-col justify-between transition-all duration-300 crimson-glow-hover"><button type="button" class="card-remove-btn" style="display:none;position:absolute;top:8px;right:8px;z-index:30;width:26px;height:26px;border-radius:9999px;background:rgba(0,0,0,0.85);border:1px solid #b91c1c;align-items:center;justify-content:center;color:#f87171;cursor:pointer;" aria-label="Remove card" title="Remove card"><span class="material-symbols-outlined" style="font-size:15px;">close</span></button>
-        <div>
-          <div class="flex items-center justify-between pb-2.5">
-            <span class="font-label-mono text-[9px] text-zinc-500 uppercase tracking-widest">ARMOR // 2024</span>
-            <span class="font-label-mono text-[9px] text-zinc-400 uppercase bg-[#150a0d] border border-red-950 px-2 py-0.5 rounded">STUDY</span>
-          </div>
-          <div class="w-full aspect-square relative my-2 overflow-hidden rounded-lg bg-black/50 flex items-center justify-center border border-red-950/40">
-            <img src="assets/placeholder-thumbnail.svg" alt="Lorem Ipsum Dolor" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-          </div>
-          <h4 class="font-headline-sm text-sm text-[#f4f4f5] font-bold uppercase tracking-wider group-hover:text-red-400 transition-colors mt-2">
-            Lorem Ipsum
-          </h4>
-          <p class="font-body-md text-zinc-400 text-xs mt-1 font-light">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-          </p>
-        </div>
-        <div class="pt-3 mt-3 border-t border-red-950/40 flex items-center justify-between">
-          <span class="font-label-mono text-[10px] text-zinc-500 uppercase">54k Tris // 4K PBR</span>
-          <span class="material-symbols-outlined text-[16px] text-zinc-500 group-hover:text-red-400 group-hover:translate-x-1 transition-all">north_east</span>
-        </div>
-      </div>
-
-      <!-- Asset 6: Eldritch Codex Tome -->
-      <div class="group relative bg-[#0c090c] border border-red-950/60 hover:border-red-600/70 rounded-xl overflow-hidden p-4 flex flex-col justify-between transition-all duration-300 crimson-glow-hover"><button type="button" class="card-remove-btn" style="display:none;position:absolute;top:8px;right:8px;z-index:30;width:26px;height:26px;border-radius:9999px;background:rgba(0,0,0,0.85);border:1px solid #b91c1c;align-items:center;justify-content:center;color:#f87171;cursor:pointer;" aria-label="Remove card" title="Remove card"><span class="material-symbols-outlined" style="font-size:15px;">close</span></button>
-        <div>
-          <div class="flex items-center justify-between pb-2.5">
-            <span class="font-label-mono text-[9px] text-zinc-500 uppercase tracking-widest">PROP // 2024</span>
-            <span class="font-label-mono text-[9px] text-red-400 uppercase bg-[#150a0d] border border-red-950 px-2 py-0.5 rounded">RELEASED</span>
-          </div>
-          <div class="w-full aspect-square relative my-2 overflow-hidden rounded-lg bg-black/50 flex items-center justify-center border border-red-950/40">
-            <img src="assets/placeholder-thumbnail.svg" alt="Lorem Ipsum Dolor" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-          </div>
-          <h4 class="font-headline-sm text-sm text-[#f4f4f5] font-bold uppercase tracking-wider group-hover:text-red-400 transition-colors mt-2">
-            Lorem Ipsum
-          </h4>
-          <p class="font-body-md text-zinc-400 text-xs mt-1 font-light">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-          </p>
-        </div>
-        <div class="pt-3 mt-3 border-t border-red-950/40 flex items-center justify-between">
-          <span class="font-label-mono text-[10px] text-zinc-500 uppercase">19k Tris // 2K PBR</span>
-          <span class="material-symbols-outlined text-[16px] text-zinc-500 group-hover:text-red-400 group-hover:translate-x-1 transition-all">north_east</span>
-        </div>
-      </div>
-
-      <!-- Asset 7: Cathedral Siege Warhammer -->
-      <div class="group relative bg-[#0c090c] border border-red-950/60 hover:border-red-600/70 rounded-xl overflow-hidden p-4 flex flex-col justify-between transition-all duration-300 crimson-glow-hover"><button type="button" class="card-remove-btn" style="display:none;position:absolute;top:8px;right:8px;z-index:30;width:26px;height:26px;border-radius:9999px;background:rgba(0,0,0,0.85);border:1px solid #b91c1c;align-items:center;justify-content:center;color:#f87171;cursor:pointer;" aria-label="Remove card" title="Remove card"><span class="material-symbols-outlined" style="font-size:15px;">close</span></button>
-        <div>
-          <div class="flex items-center justify-between pb-2.5">
-            <span class="font-label-mono text-[9px] text-zinc-500 uppercase tracking-widest">MELEE // 2025</span>
-            <span class="font-label-mono text-[9px] text-amber-400/90 uppercase bg-[#150a0d] border border-red-950 px-2 py-0.5 rounded">WIP / UNCURATED</span>
-          </div>
-          <div class="w-full aspect-square relative my-2 overflow-hidden rounded-lg bg-black/50 flex items-center justify-center border border-red-950/40">
-            <img src="assets/placeholder-thumbnail.svg" alt="Lorem Ipsum Dolor" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-          </div>
-          <h4 class="font-headline-sm text-sm text-[#f4f4f5] font-bold uppercase tracking-wider group-hover:text-red-400 transition-colors mt-2">
-            Lorem Ipsum
-          </h4>
-          <p class="font-body-md text-zinc-400 text-xs mt-1 font-light">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-          </p>
-        </div>
-        <div class="pt-3 mt-3 border-t border-red-950/40 flex items-center justify-between">
-          <span class="font-label-mono text-[10px] text-zinc-500 uppercase">64k Tris // 4K PBR</span>
-          <span class="material-symbols-outlined text-[16px] text-zinc-500 group-hover:text-red-400 group-hover:translate-x-1 transition-all">north_east</span>
-        </div>
-      </div>
-
-      <!-- Asset 8: Demon Assassin Dual Daggers -->
-      <div class="group relative bg-[#0c090c] border border-red-950/60 hover:border-red-600/70 rounded-xl overflow-hidden p-4 flex flex-col justify-between transition-all duration-300 crimson-glow-hover"><button type="button" class="card-remove-btn" style="display:none;position:absolute;top:8px;right:8px;z-index:30;width:26px;height:26px;border-radius:9999px;background:rgba(0,0,0,0.85);border:1px solid #b91c1c;align-items:center;justify-content:center;color:#f87171;cursor:pointer;" aria-label="Remove card" title="Remove card"><span class="material-symbols-outlined" style="font-size:15px;">close</span></button>
-        <div>
-          <div class="flex items-center justify-between pb-2.5">
-            <span class="font-label-mono text-[9px] text-zinc-500 uppercase tracking-widest">BLADES // 2024</span>
-            <span class="font-label-mono text-[9px] text-red-300 uppercase bg-[#150a0d] border border-red-950 px-2 py-0.5 rounded">STUDY / PROTOTYPE</span>
-          </div>
-          <div class="w-full aspect-square relative my-2 overflow-hidden rounded-lg bg-black/50 flex items-center justify-center border border-red-950/40">
-            <img src="assets/placeholder-thumbnail.svg" alt="Lorem Ipsum Dolor" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-          </div>
-          <h4 class="font-headline-sm text-sm text-[#f4f4f5] font-bold uppercase tracking-wider group-hover:text-red-400 transition-colors mt-2">
-            Lorem Ipsum
-          </h4>
-          <p class="font-body-md text-zinc-400 text-xs mt-1 font-light">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-          </p>
-        </div>
-        <div class="pt-3 mt-3 border-t border-red-950/40 flex items-center justify-between">
-          <span class="font-label-mono text-[10px] text-zinc-500 uppercase">24k Tris // 4K PBR</span>
-          <span class="material-symbols-outlined text-[16px] text-zinc-500 group-hover:text-red-400 group-hover:translate-x-1 transition-all">north_east</span>
-        </div>
-      </div>
-
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" id="all-works-grid">
+      <div class="group relative bg-[#0c090c] border border-red-950/60 hover:border-red-600/70 rounded-xl overflow-hidden p-4 flex flex-col justify-between transition-all duration-300 crimson-glow-hover"><button type="button" class="card-remove-btn" style="display:none;position:absolute;top:8px;right:8px;z-index:30;width:26px;height:26px;border-radius:9999px;background:rgba(0,0,0,0.85);border:1px solid #b91c1c;align-items:center;justify-content:center;color:#f87171;cursor:pointer;" aria-label="Remove card" title="Remove card"><span class="material-symbols-outlined" style="font-size:15px;">close</span></button><div><div class="flex items-center justify-between pb-2.5"><span class="card-category-label font-label-mono text-[9px] text-zinc-500 uppercase tracking-widest">Male Hair</span><span class="font-label-mono text-[9px] text-red-400 uppercase bg-[#150a0d] border border-red-950 px-2 py-0.5 rounded">RELEASED</span></div><div class="img-stage w-full aspect-square relative my-2 overflow-hidden rounded-lg bg-black/50 flex items-center justify-center border border-red-950/40"><img src="assets/works/punky-hair-main.png" alt="Punky Hair" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"></div><h4 class="font-headline-sm text-sm text-[#f4f4f5] font-bold uppercase tracking-wider group-hover:text-red-400 transition-colors mt-2">Punky Hair</h4><p class="font-body-md text-zinc-400 text-xs mt-1 font-light">Spiked punk-style male hair, created for a Roblox UGC group.</p><div class="card-tags flex flex-wrap items-center gap-1.5 mt-2"><span class="card-tag" style="display:inline-flex;align-items:center;gap:4px;border:1px solid #7f1d1d;background:#150a0d;color:#fca5a5;font-family:ui-monospace,monospace;font-size:10px;border-radius:9999px;padding:2px 4px 2px 8px;"><span class="card-tag-label">#Blender</span><button type="button" class="card-tag-remove builder-only-control" data-show-display="inline-flex" style="display:none;align-items:center;justify-content:center;width:12px;height:12px;border:none;background:transparent;color:#fca5a5;cursor:pointer;padding:0;font-size:12px;line-height:1;">×</button></span><span class="card-tag" style="display:inline-flex;align-items:center;gap:4px;border:1px solid #7f1d1d;background:#150a0d;color:#fca5a5;font-family:ui-monospace,monospace;font-size:10px;border-radius:9999px;padding:2px 4px 2px 8px;"><span class="card-tag-label">#SubstancePainter</span><button type="button" class="card-tag-remove builder-only-control" data-show-display="inline-flex" style="display:none;align-items:center;justify-content:center;width:12px;height:12px;border:none;background:transparent;color:#fca5a5;cursor:pointer;padding:0;font-size:12px;line-height:1;">×</button></span></div><div class="card-gallery-data" style="display:none"><img src="assets/works/punky-hair-01.png" alt="Gallery image"></div></div><div class="pt-3 mt-3 border-t border-red-950/40 flex items-center justify-between"><span class="font-label-mono text-[10px] text-zinc-500 uppercase">3,999 Tris // 1K PBR</span><span class="material-symbols-outlined text-[16px] text-zinc-500 group-hover:text-red-400 group-hover:translate-x-1 transition-all">north_east</span></div></div>
+      <div class="group relative bg-[#0c090c] border border-red-950/60 hover:border-red-600/70 rounded-xl overflow-hidden p-4 flex flex-col justify-between transition-all duration-300 crimson-glow-hover"><button type="button" class="card-remove-btn" style="display:none;position:absolute;top:8px;right:8px;z-index:30;width:26px;height:26px;border-radius:9999px;background:rgba(0,0,0,0.85);border:1px solid #b91c1c;align-items:center;justify-content:center;color:#f87171;cursor:pointer;" aria-label="Remove card" title="Remove card"><span class="material-symbols-outlined" style="font-size:15px;">close</span></button><div><div class="flex items-center justify-between pb-2.5"><span class="card-category-label font-label-mono text-[9px] text-zinc-500 uppercase tracking-widest">Male Hair</span><span class="font-label-mono text-[9px] text-red-400 uppercase bg-[#150a0d] border border-red-950 px-2 py-0.5 rounded">RELEASED</span></div><div class="img-stage w-full aspect-square relative my-2 overflow-hidden rounded-lg bg-black/50 flex items-center justify-center border border-red-950/40"><img src="assets/works/messy-boy-hair-main.png" alt="Messy Boy Hair" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"></div><h4 class="font-headline-sm text-sm text-[#f4f4f5] font-bold uppercase tracking-wider group-hover:text-red-400 transition-colors mt-2">Messy Boy Hair</h4><p class="font-body-md text-zinc-400 text-xs mt-1 font-light">Tousled everyday male hairstyle, created for a Roblox UGC group.</p><div class="card-tags flex flex-wrap items-center gap-1.5 mt-2"><span class="card-tag" style="display:inline-flex;align-items:center;gap:4px;border:1px solid #7f1d1d;background:#150a0d;color:#fca5a5;font-family:ui-monospace,monospace;font-size:10px;border-radius:9999px;padding:2px 4px 2px 8px;"><span class="card-tag-label">#Blender</span><button type="button" class="card-tag-remove builder-only-control" data-show-display="inline-flex" style="display:none;align-items:center;justify-content:center;width:12px;height:12px;border:none;background:transparent;color:#fca5a5;cursor:pointer;padding:0;font-size:12px;line-height:1;">×</button></span><span class="card-tag" style="display:inline-flex;align-items:center;gap:4px;border:1px solid #7f1d1d;background:#150a0d;color:#fca5a5;font-family:ui-monospace,monospace;font-size:10px;border-radius:9999px;padding:2px 4px 2px 8px;"><span class="card-tag-label">#SubstancePainter</span><button type="button" class="card-tag-remove builder-only-control" data-show-display="inline-flex" style="display:none;align-items:center;justify-content:center;width:12px;height:12px;border:none;background:transparent;color:#fca5a5;cursor:pointer;padding:0;font-size:12px;line-height:1;">×</button></span></div><div class="card-gallery-data" style="display:none"><img src="assets/works/messy-boy-hair-01.png" alt="Gallery image"></div></div><div class="pt-3 mt-3 border-t border-red-950/40 flex items-center justify-between"><span class="font-label-mono text-[10px] text-zinc-500 uppercase">3,742 Tris // 1K PBR</span><span class="material-symbols-outlined text-[16px] text-zinc-500 group-hover:text-red-400 group-hover:translate-x-1 transition-all">north_east</span></div></div>
+      <div class="group relative bg-[#0c090c] border border-red-950/60 hover:border-red-600/70 rounded-xl overflow-hidden p-4 flex flex-col justify-between transition-all duration-300 crimson-glow-hover"><button type="button" class="card-remove-btn" style="display:none;position:absolute;top:8px;right:8px;z-index:30;width:26px;height:26px;border-radius:9999px;background:rgba(0,0,0,0.85);border:1px solid #b91c1c;align-items:center;justify-content:center;color:#f87171;cursor:pointer;" aria-label="Remove card" title="Remove card"><span class="material-symbols-outlined" style="font-size:15px;">close</span></button><div><div class="flex items-center justify-between pb-2.5"><span class="card-category-label font-label-mono text-[9px] text-zinc-500 uppercase tracking-widest">UGC</span><span class="font-label-mono text-[9px] text-red-400 uppercase bg-[#150a0d] border border-red-950 px-2 py-0.5 rounded">RELEASED</span></div><div class="img-stage w-full aspect-square relative my-2 overflow-hidden rounded-lg bg-black/50 flex items-center justify-center border border-red-950/40"><img src="assets/works/theatre-mask-main.png" alt="Theatre Mask" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"></div><h4 class="font-headline-sm text-sm text-[#f4f4f5] font-bold uppercase tracking-wider group-hover:text-red-400 transition-colors mt-2">Theatre Mask</h4><p class="font-body-md text-zinc-400 text-xs mt-1 font-light">Wearable theatre-mask accessory, created for a Roblox catalog group.</p><div class="card-tags flex flex-wrap items-center gap-1.5 mt-2"><span class="card-tag" style="display:inline-flex;align-items:center;gap:4px;border:1px solid #7f1d1d;background:#150a0d;color:#fca5a5;font-family:ui-monospace,monospace;font-size:10px;border-radius:9999px;padding:2px 4px 2px 8px;"><span class="card-tag-label">#Blender</span><button type="button" class="card-tag-remove builder-only-control" data-show-display="inline-flex" style="display:none;align-items:center;justify-content:center;width:12px;height:12px;border:none;background:transparent;color:#fca5a5;cursor:pointer;padding:0;font-size:12px;line-height:1;">×</button></span><span class="card-tag" style="display:inline-flex;align-items:center;gap:4px;border:1px solid #7f1d1d;background:#150a0d;color:#fca5a5;font-family:ui-monospace,monospace;font-size:10px;border-radius:9999px;padding:2px 4px 2px 8px;"><span class="card-tag-label">#SubstancePainter</span><button type="button" class="card-tag-remove builder-only-control" data-show-display="inline-flex" style="display:none;align-items:center;justify-content:center;width:12px;height:12px;border:none;background:transparent;color:#fca5a5;cursor:pointer;padding:0;font-size:12px;line-height:1;">×</button></span></div><div class="card-gallery-data" style="display:none"><img src="assets/works/theatre-mask-01.png" alt="Gallery image"></div></div><div class="pt-3 mt-3 border-t border-red-950/40 flex items-center justify-between"><span class="font-label-mono text-[10px] text-zinc-500 uppercase">3,485 Tris // 1K PBR</span><span class="material-symbols-outlined text-[16px] text-zinc-500 group-hover:text-red-400 group-hover:translate-x-1 transition-all">north_east</span></div></div>
+      <div class="group relative bg-[#0c090c] border border-red-950/60 hover:border-red-600/70 rounded-xl overflow-hidden p-4 flex flex-col justify-between transition-all duration-300 crimson-glow-hover"><button type="button" class="card-remove-btn" style="display:none;position:absolute;top:8px;right:8px;z-index:30;width:26px;height:26px;border-radius:9999px;background:rgba(0,0,0,0.85);border:1px solid #b91c1c;align-items:center;justify-content:center;color:#f87171;cursor:pointer;" aria-label="Remove card" title="Remove card"><span class="material-symbols-outlined" style="font-size:15px;">close</span></button><div><div class="flex items-center justify-between pb-2.5"><span class="card-category-label font-label-mono text-[9px] text-zinc-500 uppercase tracking-widest">UGC</span><span class="font-label-mono text-[9px] text-red-400 uppercase bg-[#150a0d] border border-red-950 px-2 py-0.5 rounded">RELEASED</span></div><div class="img-stage w-full aspect-square relative my-2 overflow-hidden rounded-lg bg-black/50 flex items-center justify-center border border-red-950/40"><img src="assets/works/pigtails-star-cross-cap-main.png" alt="Pigtails w/ Star &amp; Cross Cap" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"></div><h4 class="font-headline-sm text-sm text-[#f4f4f5] font-bold uppercase tracking-wider group-hover:text-red-400 transition-colors mt-2">Pigtails w/ Star &amp; Cross Cap</h4><p class="font-body-md text-zinc-400 text-xs mt-1 font-light">Pigtail hairstyle bundled with a star-and-cross cap accessory.</p><div class="card-tags flex flex-wrap items-center gap-1.5 mt-2"><span class="card-tag" style="display:inline-flex;align-items:center;gap:4px;border:1px solid #7f1d1d;background:#150a0d;color:#fca5a5;font-family:ui-monospace,monospace;font-size:10px;border-radius:9999px;padding:2px 4px 2px 8px;"><span class="card-tag-label">#Blender</span><button type="button" class="card-tag-remove builder-only-control" data-show-display="inline-flex" style="display:none;align-items:center;justify-content:center;width:12px;height:12px;border:none;background:transparent;color:#fca5a5;cursor:pointer;padding:0;font-size:12px;line-height:1;">×</button></span><span class="card-tag" style="display:inline-flex;align-items:center;gap:4px;border:1px solid #7f1d1d;background:#150a0d;color:#fca5a5;font-family:ui-monospace,monospace;font-size:10px;border-radius:9999px;padding:2px 4px 2px 8px;"><span class="card-tag-label">#SubstancePainter</span><button type="button" class="card-tag-remove builder-only-control" data-show-display="inline-flex" style="display:none;align-items:center;justify-content:center;width:12px;height:12px;border:none;background:transparent;color:#fca5a5;cursor:pointer;padding:0;font-size:12px;line-height:1;">×</button></span></div><div class="card-gallery-data" style="display:none"><img src="assets/works/pigtails-star-cross-cap-01.png" alt="Gallery image"></div></div><div class="pt-3 mt-3 border-t border-red-950/40 flex items-center justify-between"><span class="font-label-mono text-[10px] text-zinc-500 uppercase">3,986 Tris // 1K PBR</span><span class="material-symbols-outlined text-[16px] text-zinc-500 group-hover:text-red-400 group-hover:translate-x-1 transition-all">north_east</span></div></div>
+      <div class="group relative bg-[#0c090c] border border-red-950/60 hover:border-red-600/70 rounded-xl overflow-hidden p-4 flex flex-col justify-between transition-all duration-300 crimson-glow-hover"><button type="button" class="card-remove-btn" style="display:none;position:absolute;top:8px;right:8px;z-index:30;width:26px;height:26px;border-radius:9999px;background:rgba(0,0,0,0.85);border:1px solid #b91c1c;align-items:center;justify-content:center;color:#f87171;cursor:pointer;" aria-label="Remove card" title="Remove card"><span class="material-symbols-outlined" style="font-size:15px;">close</span></button><div><div class="flex items-center justify-between pb-2.5"><span class="card-category-label font-label-mono text-[9px] text-zinc-500 uppercase tracking-widest">Girl Hair</span><span class="font-label-mono text-[9px] text-red-400 uppercase bg-[#150a0d] border border-red-950 px-2 py-0.5 rounded">RELEASED</span></div><div class="img-stage w-full aspect-square relative my-2 overflow-hidden rounded-lg bg-black/50 flex items-center justify-center border border-red-950/40"><img src="assets/works/girl-hair-main.png" alt="Girl Hair" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"></div><h4 class="font-headline-sm text-sm text-[#f4f4f5] font-bold uppercase tracking-wider group-hover:text-red-400 transition-colors mt-2">Girl Hair</h4><p class="font-body-md text-zinc-400 text-xs mt-1 font-light">Long-layered feminine hairstyle, created for a Roblox UGC group.</p><div class="card-tags flex flex-wrap items-center gap-1.5 mt-2"><span class="card-tag" style="display:inline-flex;align-items:center;gap:4px;border:1px solid #7f1d1d;background:#150a0d;color:#fca5a5;font-family:ui-monospace,monospace;font-size:10px;border-radius:9999px;padding:2px 4px 2px 8px;"><span class="card-tag-label">#Blender</span><button type="button" class="card-tag-remove builder-only-control" data-show-display="inline-flex" style="display:none;align-items:center;justify-content:center;width:12px;height:12px;border:none;background:transparent;color:#fca5a5;cursor:pointer;padding:0;font-size:12px;line-height:1;">×</button></span><span class="card-tag" style="display:inline-flex;align-items:center;gap:4px;border:1px solid #7f1d1d;background:#150a0d;color:#fca5a5;font-family:ui-monospace,monospace;font-size:10px;border-radius:9999px;padding:2px 4px 2px 8px;"><span class="card-tag-label">#SubstancePainter</span><button type="button" class="card-tag-remove builder-only-control" data-show-display="inline-flex" style="display:none;align-items:center;justify-content:center;width:12px;height:12px;border:none;background:transparent;color:#fca5a5;cursor:pointer;padding:0;font-size:12px;line-height:1;">×</button></span></div><div class="card-gallery-data" style="display:none"><img src="assets/works/girl-hair-01.png" alt="Gallery image"></div></div><div class="pt-3 mt-3 border-t border-red-950/40 flex items-center justify-between"><span class="font-label-mono text-[10px] text-zinc-500 uppercase">3,983 Tris // 1K PBR</span><span class="material-symbols-outlined text-[16px] text-zinc-500 group-hover:text-red-400 group-hover:translate-x-1 transition-all">north_east</span></div></div>
+      <div class="group relative bg-[#0c090c] border border-red-950/60 hover:border-red-600/70 rounded-xl overflow-hidden p-4 flex flex-col justify-between transition-all duration-300 crimson-glow-hover"><button type="button" class="card-remove-btn" style="display:none;position:absolute;top:8px;right:8px;z-index:30;width:26px;height:26px;border-radius:9999px;background:rgba(0,0,0,0.85);border:1px solid #b91c1c;align-items:center;justify-content:center;color:#f87171;cursor:pointer;" aria-label="Remove card" title="Remove card"><span class="material-symbols-outlined" style="font-size:15px;">close</span></button><div><div class="flex items-center justify-between pb-2.5"><span class="card-category-label font-label-mono text-[9px] text-zinc-500 uppercase tracking-widest">Anime Comms</span><span class="font-label-mono text-[9px] text-red-400 uppercase bg-[#150a0d] border border-red-950 px-2 py-0.5 rounded">RELEASED</span></div><div class="img-stage w-full aspect-square relative my-2 overflow-hidden rounded-lg bg-black/50 flex items-center justify-center border border-red-950/40"><img src="assets/works/dio-head-set-main.png" alt="Dio Head Set" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"></div><h4 class="font-headline-sm text-sm text-[#f4f4f5] font-bold uppercase tracking-wider group-hover:text-red-400 transition-colors mt-2">Dio Head Set</h4><p class="font-body-md text-zinc-400 text-xs mt-1 font-light">Anime commission head set, based on the Dio Brando likeness.</p><div class="card-tags flex flex-wrap items-center gap-1.5 mt-2"><span class="card-tag" style="display:inline-flex;align-items:center;gap:4px;border:1px solid #7f1d1d;background:#150a0d;color:#fca5a5;font-family:ui-monospace,monospace;font-size:10px;border-radius:9999px;padding:2px 4px 2px 8px;"><span class="card-tag-label">#Blender</span><button type="button" class="card-tag-remove builder-only-control" data-show-display="inline-flex" style="display:none;align-items:center;justify-content:center;width:12px;height:12px;border:none;background:transparent;color:#fca5a5;cursor:pointer;padding:0;font-size:12px;line-height:1;">×</button></span><span class="card-tag" style="display:inline-flex;align-items:center;gap:4px;border:1px solid #7f1d1d;background:#150a0d;color:#fca5a5;font-family:ui-monospace,monospace;font-size:10px;border-radius:9999px;padding:2px 4px 2px 8px;"><span class="card-tag-label">#SubstancePainter</span><button type="button" class="card-tag-remove builder-only-control" data-show-display="inline-flex" style="display:none;align-items:center;justify-content:center;width:12px;height:12px;border:none;background:transparent;color:#fca5a5;cursor:pointer;padding:0;font-size:12px;line-height:1;">×</button></span></div><div class="card-gallery-data" style="display:none"><img src="assets/works/dio-head-set-01.png" alt="Gallery image"></div></div><div class="pt-3 mt-3 border-t border-red-950/40 flex items-center justify-between"><span class="font-label-mono text-[10px] text-zinc-500 uppercase">3,712 Tris // 1K PBR</span><span class="material-symbols-outlined text-[16px] text-zinc-500 group-hover:text-red-400 group-hover:translate-x-1 transition-all">north_east</span></div></div>
+      <div class="group relative bg-[#0c090c] border border-red-950/60 hover:border-red-600/70 rounded-xl overflow-hidden p-4 flex flex-col justify-between transition-all duration-300 crimson-glow-hover"><button type="button" class="card-remove-btn" style="display:none;position:absolute;top:8px;right:8px;z-index:30;width:26px;height:26px;border-radius:9999px;background:rgba(0,0,0,0.85);border:1px solid #b91c1c;align-items:center;justify-content:center;color:#f87171;cursor:pointer;" aria-label="Remove card" title="Remove card"><span class="material-symbols-outlined" style="font-size:15px;">close</span></button><div><div class="flex items-center justify-between pb-2.5"><span class="card-category-label font-label-mono text-[9px] text-zinc-500 uppercase tracking-widest">Anime Comms</span><span class="font-label-mono text-[9px] text-red-400 uppercase bg-[#150a0d] border border-red-950 px-2 py-0.5 rounded">RELEASED</span></div><div class="img-stage w-full aspect-square relative my-2 overflow-hidden rounded-lg bg-black/50 flex items-center justify-center border border-red-950/40"><img src="assets/works/izuku-midoriya-set-main.png" alt="Izuku Midoriya Set" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"></div><h4 class="font-headline-sm text-sm text-[#f4f4f5] font-bold uppercase tracking-wider group-hover:text-red-400 transition-colors mt-2">Izuku Midoriya Set</h4><p class="font-body-md text-zinc-400 text-xs mt-1 font-light">Anime commission head and hair set, based on the Izuku Midoriya likeness.</p><div class="card-tags flex flex-wrap items-center gap-1.5 mt-2"><span class="card-tag" style="display:inline-flex;align-items:center;gap:4px;border:1px solid #7f1d1d;background:#150a0d;color:#fca5a5;font-family:ui-monospace,monospace;font-size:10px;border-radius:9999px;padding:2px 4px 2px 8px;"><span class="card-tag-label">#Blender</span><button type="button" class="card-tag-remove builder-only-control" data-show-display="inline-flex" style="display:none;align-items:center;justify-content:center;width:12px;height:12px;border:none;background:transparent;color:#fca5a5;cursor:pointer;padding:0;font-size:12px;line-height:1;">×</button></span><span class="card-tag" style="display:inline-flex;align-items:center;gap:4px;border:1px solid #7f1d1d;background:#150a0d;color:#fca5a5;font-family:ui-monospace,monospace;font-size:10px;border-radius:9999px;padding:2px 4px 2px 8px;"><span class="card-tag-label">#SubstancePainter</span><button type="button" class="card-tag-remove builder-only-control" data-show-display="inline-flex" style="display:none;align-items:center;justify-content:center;width:12px;height:12px;border:none;background:transparent;color:#fca5a5;cursor:pointer;padding:0;font-size:12px;line-height:1;">×</button></span></div><div class="card-gallery-data" style="display:none"><img src="assets/works/izuku-midoriya-set-01.png" alt="Gallery image"></div></div><div class="pt-3 mt-3 border-t border-red-950/40 flex items-center justify-between"><span class="font-label-mono text-[10px] text-zinc-500 uppercase">3,942 Tris // 1K PBR</span><span class="material-symbols-outlined text-[16px] text-zinc-500 group-hover:text-red-400 group-hover:translate-x-1 transition-all">north_east</span></div></div>
+      <div class="group relative bg-[#0c090c] border border-red-950/60 hover:border-red-600/70 rounded-xl overflow-hidden p-4 flex flex-col justify-between transition-all duration-300 crimson-glow-hover"><button type="button" class="card-remove-btn" style="display:none;position:absolute;top:8px;right:8px;z-index:30;width:26px;height:26px;border-radius:9999px;background:rgba(0,0,0,0.85);border:1px solid #b91c1c;align-items:center;justify-content:center;color:#f87171;cursor:pointer;" aria-label="Remove card" title="Remove card"><span class="material-symbols-outlined" style="font-size:15px;">close</span></button><div><div class="flex items-center justify-between pb-2.5"><span class="card-category-label font-label-mono text-[9px] text-zinc-500 uppercase tracking-widest">Dynamic Head</span><span class="font-label-mono text-[9px] text-red-400 uppercase bg-[#150a0d] border border-red-950 px-2 py-0.5 rounded">RELEASED</span></div><div class="img-stage w-full aspect-square relative my-2 overflow-hidden rounded-lg bg-black/50 flex items-center justify-center border border-red-950/40"><img src="assets/works/emo-moe-dynamic-head-main.png" alt="Emo moe Dynamic Head" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"></div><h4 class="font-headline-sm text-sm text-[#f4f4f5] font-bold uppercase tracking-wider group-hover:text-red-400 transition-colors mt-2">Emo moe Dynamic Head</h4><p class="font-body-md text-zinc-400 text-xs mt-1 font-light">Rigged emo-styled dynamic head with expressive animated facial motion.</p><div class="card-tags flex flex-wrap items-center gap-1.5 mt-2"><span class="card-tag" style="display:inline-flex;align-items:center;gap:4px;border:1px solid #7f1d1d;background:#150a0d;color:#fca5a5;font-family:ui-monospace,monospace;font-size:10px;border-radius:9999px;padding:2px 4px 2px 8px;"><span class="card-tag-label">#Blender</span><button type="button" class="card-tag-remove builder-only-control" data-show-display="inline-flex" style="display:none;align-items:center;justify-content:center;width:12px;height:12px;border:none;background:transparent;color:#fca5a5;cursor:pointer;padding:0;font-size:12px;line-height:1;">×</button></span><span class="card-tag" style="display:inline-flex;align-items:center;gap:4px;border:1px solid #7f1d1d;background:#150a0d;color:#fca5a5;font-family:ui-monospace,monospace;font-size:10px;border-radius:9999px;padding:2px 4px 2px 8px;"><span class="card-tag-label">#SubstancePainter</span><button type="button" class="card-tag-remove builder-only-control" data-show-display="inline-flex" style="display:none;align-items:center;justify-content:center;width:12px;height:12px;border:none;background:transparent;color:#fca5a5;cursor:pointer;padding:0;font-size:12px;line-height:1;">×</button></span></div><div class="card-gallery-data" style="display:none"><img src="assets/works/emo-moe-dynamic-head-01.png" alt="Gallery image"></div></div><div class="pt-3 mt-3 border-t border-red-950/40 flex items-center justify-between"><span class="font-label-mono text-[10px] text-zinc-500 uppercase">3,712 Tris // 1K PBR</span><span class="material-symbols-outlined text-[16px] text-zinc-500 group-hover:text-red-400 group-hover:translate-x-1 transition-all">north_east</span></div></div>
       <button type="button" id="add-work-tile" style="display:none" class="border-2 border-dashed border-red-950/70 hover:border-red-600 rounded-xl flex flex-col items-center justify-center gap-2 p-4 min-h-[280px] text-zinc-500 hover:text-red-400 transition-colors bg-[#0a0709]/60">
         <span class="material-symbols-outlined text-3xl">add_circle</span>
         <span class="font-label-mono text-xs uppercase tracking-widest">Add New Work</span>
@@ -680,7 +502,7 @@
 
 
 <!-- ember init moved to consolidated boot script at end of body -->
-<div id="asset-lightbox-modal" class="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 transition-all duration-300 opacity-0 pointer-events-none" role="dialog" aria-modal="true" aria-hidden="true"><div id="modal-backdrop-trigger" class="absolute inset-0 bg-black/80 backdrop-blur-md cursor-pointer transition-opacity duration-300"></div><div class="relative z-10 w-full max-w-[92rem] bg-[#0c090c] border border-red-900/80 rounded-2xl overflow-hidden shadow-[0_0_50px_rgba(225,29,72,0.35)] flex flex-col md:flex-row max-h-[95vh]"><div class="relative w-full md:w-[70%] aspect-square md:aspect-auto bg-black/70 flex items-center justify-center overflow-hidden border-b md:border-b-0 md:border-r border-red-950/60"><img id="modal-asset-img" src="" alt="" class="w-full h-full object-cover transition-transform duration-500"><div class="absolute bottom-4 right-4 z-20 flex items-center gap-1 bg-[#0a0709]/90 border border-red-950 rounded p-1"><button type="button" id="modal-prev-btn" class="p-1.5 text-zinc-400 hover:text-white transition-colors"><span class="material-symbols-outlined text-xl">chevron_left</span></button><button type="button" id="modal-next-btn" class="p-1.5 text-zinc-400 hover:text-white transition-colors"><span class="material-symbols-outlined text-xl">chevron_right</span></button></div></div><div class="w-full md:w-[30%] p-6 sm:p-8 flex flex-col justify-between overflow-y-auto"><div class="flex flex-col gap-4"><div class="flex items-center justify-between"><span id="modal-category-badge" class="font-label-mono text-[10px] text-red-400 tracking-widest uppercase bg-[#150a0d] border border-red-950 px-2.5 py-0.5 rounded">MELEE // 2025</span><button type="button" id="modal-close-btn" class="w-8 h-8 rounded bg-[#150a0d] border border-red-950/80 flex items-center justify-center text-zinc-400 hover:text-white hover:border-red-600 transition-colors"><span class="material-symbols-outlined text-base">close</span></button></div><h3 id="modal-title" class="font-headline-md text-2xl text-[#f4f4f5] tracking-wide uppercase mt-1">Lorem Ipsum 01</h3><div class="flex items-center gap-4 text-xs font-label-mono text-zinc-400 border-y border-red-950/50 py-2.5"><div class="flex items-center gap-1.5"><span class="text-red-500">◈</span><span id="modal-tris-spec" class="">42k Tris</span></div><div class="flex items-center gap-1.5"><span class="text-red-500">◈</span><span id="modal-texture-spec" class="">4K PBR</span></div></div><p id="modal-desc" class="font-body-md text-zinc-300 text-sm font-light leading-relaxed">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt.</p></div><div class="pt-6 border-t border-red-950/60 mt-6 flex items-center justify-between"><span class="font-label-mono text-[10px] text-zinc-500 uppercase">STATUS: READY FOR PRODUCTION</span><a href="#contact-teaser" id="modal-inquire-link" class="px-4 py-2 bg-red-700 hover:bg-red-600 text-white rounded font-label-mono text-xs uppercase tracking-widest transition-colors">INQUIRE ASSET</a></div></div></div></div>
+<div id="asset-lightbox-modal" class="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 transition-all duration-300 opacity-0 pointer-events-none" role="dialog" aria-modal="true" aria-hidden="true"><div id="modal-backdrop-trigger" class="absolute inset-0 bg-black/80 backdrop-blur-md cursor-pointer transition-opacity duration-300"></div><div class="relative z-10 w-full max-w-[92rem] bg-[#0c090c] border border-red-900/80 rounded-2xl overflow-hidden shadow-[0_0_50px_rgba(225,29,72,0.35)] flex flex-col md:flex-row max-h-[95vh]"><div class="relative w-full md:w-[70%] aspect-square md:aspect-auto bg-black/70 flex items-center justify-center overflow-hidden border-b md:border-b-0 md:border-r border-red-950/60"><img id="modal-asset-img" src="" alt="" class="w-full h-full object-cover transition-transform duration-500"><div class="absolute bottom-4 right-4 z-20 flex items-center gap-1 bg-[#0a0709]/90 border border-red-950 rounded p-1"><button type="button" id="modal-prev-btn" class="p-1.5 text-zinc-400 hover:text-white transition-colors"><span class="material-symbols-outlined text-xl">chevron_left</span></button><button type="button" id="modal-next-btn" class="p-1.5 text-zinc-400 hover:text-white transition-colors"><span class="material-symbols-outlined text-xl">chevron_right</span></button></div></div><div class="w-full md:w-[30%] p-6 sm:p-8 flex flex-col justify-between overflow-y-auto"><div class="flex flex-col gap-4"><div class="flex items-center justify-between"><span id="modal-category-badge" class="font-label-mono text-[10px] text-red-400 tracking-widest uppercase bg-[#150a0d] border border-red-950 px-2.5 py-0.5 rounded">MELEE // 2025</span><button type="button" id="modal-close-btn" class="w-8 h-8 rounded bg-[#150a0d] border border-red-950/80 flex items-center justify-center text-zinc-400 hover:text-white hover:border-red-600 transition-colors"><span class="material-symbols-outlined text-base">close</span></button></div><h3 id="modal-title" class="font-headline-md text-2xl text-[#f4f4f5] tracking-wide uppercase mt-1">Lorem Ipsum 01</h3><div class="flex items-center gap-4 text-xs font-label-mono text-zinc-400 border-y border-red-950/50 py-2.5"><div class="flex items-center gap-1.5"><span class="text-red-500">◈</span><span id="modal-tris-spec" class="">42k Tris</span></div><div class="flex items-center gap-1.5"><span class="text-red-500">◈</span><span id="modal-texture-spec" class="">4K PBR</span></div></div><p id="modal-desc" class="font-body-md text-zinc-300 text-sm font-light leading-relaxed">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt.</p><div id="modal-tags" class="flex flex-wrap gap-1.5"></div><div id="modal-gallery-strip" class="flex flex-wrap gap-2"></div></div><div class="pt-6 border-t border-red-950/60 mt-6 flex items-center justify-between"><span class="font-label-mono text-[10px] text-zinc-500 uppercase">STATUS: READY FOR PRODUCTION</span><a href="#contact-teaser" id="modal-inquire-link" class="px-4 py-2 bg-red-700 hover:bg-red-600 text-white rounded font-label-mono text-xs uppercase tracking-widest transition-colors">INQUIRE ASSET</a></div></div></div></div>
 <div id="builder-toolbar">
 <button type="button" id="builder-reset-btn">Reset</button>
 <button type="button" id="builder-export-btn">⬇ Export index.html</button>
@@ -699,7 +521,29 @@ const modalTris=document.getElementById('modal-tris-spec');
 const modalTexture=document.getElementById('modal-texture-spec');
 const modalDesc=document.getElementById('modal-desc');
 
+function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 function renderImage(){ if(modalImg && currentImages.length) modalImg.src=currentImages[currentImageIndex]; }
+function renderModalGallery(){
+  const strip=document.getElementById('modal-gallery-strip');
+  if(!strip) return;
+  strip.innerHTML='';
+  if(currentImages.length<2) return;
+  currentImages.forEach((src,i)=>{
+    const thumb=document.createElement('button');
+    thumb.type='button';
+    thumb.style.cssText='width:48px;height:48px;border-radius:6px;overflow:hidden;border:2px solid '+(i===currentImageIndex?'#dc2626':'rgba(127,29,29,0.5)')+';padding:0;cursor:pointer;background:#000;flex:0 0 auto;';
+    const img=document.createElement('img');
+    img.src=src; img.style.cssText='width:100%;height:100%;object-fit:cover;';
+    thumb.appendChild(img);
+    thumb.addEventListener('click',()=>{ currentImageIndex=i; renderImage(); renderModalGallery(); });
+    strip.appendChild(thumb);
+  });
+}
+function renderModalTags(tags){
+  const wrap=document.getElementById('modal-tags');
+  if(!wrap) return;
+  wrap.innerHTML=(tags||[]).map(t=>'<span style="display:inline-flex;border:1px solid #7f1d1d;background:#150a0d;color:#fca5a5;font-family:ui-monospace,monospace;font-size:10px;border-radius:9999px;padding:2px 8px;">'+escapeHtml(t)+'</span>').join('');
+}
 function renderModalFields(data){
   if(modalTitle) modalTitle.textContent=data.title;
   if(modalCategory) modalCategory.textContent=data.category;
@@ -709,32 +553,42 @@ function renderModalFields(data){
   currentImages=(data.images && data.images.length)?data.images:['assets/placeholder-thumbnail.svg'];
   currentImageIndex=0;
   renderImage();
+  renderModalGallery();
+  renderModalTags(data.tags);
 }
 function showModal(){ if(modal){ modal.classList.remove('opacity-0','pointer-events-none'); modal.classList.add('opacity-100','pointer-events-auto'); } }
 function closeModal(){ if(modal){ modal.classList.remove('opacity-100','pointer-events-auto'); modal.classList.add('opacity-0','pointer-events-none'); } }
-function showImage(step){ if(!currentImages.length) return; currentImageIndex=(currentImageIndex+step+currentImages.length)%currentImages.length; renderImage(); }
+function showImage(step){ if(!currentImages.length) return; currentImageIndex=(currentImageIndex+step+currentImages.length)%currentImages.length; renderImage(); renderModalGallery(); }
 function openModal(index){ const i=(index+assetsData.length)%assetsData.length; renderModalFields(assetsData[i]); showModal(); }
 
 function openModalFromCard(card){
   const titleEl=card.querySelector('h4');
   const descEl=card.querySelector('p');
-  const imgEl=card.querySelector('img');
+  const imgEl=card.querySelector('.img-stage img') || card.querySelector('img');
   const headerRow=card.querySelector('.flex.items-center.justify-between');
   const footerRow=card.querySelector('.pt-3.mt-3');
-  const category=headerRow ? headerRow.querySelector('span:first-child') : null;
+  const catLabel=card.querySelector('.card-category-label');
+  const category=catLabel || (headerRow ? headerRow.querySelector('span:first-child') : null);
   const specSpan=footerRow ? footerRow.querySelector('span:first-child') : null;
   let tris='', texture='';
   if(specSpan && specSpan.textContent){
     const parts=specSpan.textContent.split('//').map(s=>s.trim());
     tris=parts[0]||''; texture=parts[1]||'';
   }
+  const gallery=Array.from(card.querySelectorAll('.card-gallery-data img')).map(i=>i.src);
+  const images=imgEl ? [imgEl.src].concat(gallery) : (gallery.length?gallery:['assets/placeholder-thumbnail.svg']);
+  const tags=Array.from(card.querySelectorAll('.card-tags .card-tag')).map(t=>{
+    const label=t.querySelector('.card-tag-label')||t;
+    return label.textContent.trim();
+  }).filter(Boolean);
   renderModalFields({
     title: titleEl ? titleEl.textContent.trim() : 'Untitled Work',
     category: category ? category.textContent.trim() : 'WORK',
     tris: tris,
     texture: texture,
     desc: descEl ? descEl.textContent.trim() : '',
-    images: imgEl ? [imgEl.src] : ['assets/placeholder-thumbnail.svg']
+    images: images,
+    tags: tags
   });
   showModal();
 }
@@ -812,27 +666,45 @@ function initCarousel(){
   }
   if(prevBtn) prevBtn.addEventListener('click',()=>{ currentIndex=(currentIndex-1+totalCards)%totalCards; updateCarousel(); });
   if(nextBtn) nextBtn.addEventListener('click',()=>{ currentIndex=(currentIndex+1)%totalCards; updateCarousel(); });
-  cards.forEach((card,idx)=>{ card.addEventListener('click',()=>{ currentIndex=idx; updateCarousel(); }); });
+  cards.forEach((card,idx)=>{ card.addEventListener('click',(e)=>{
+    if(document.body.classList.contains('builder-active')) return;
+    currentIndex=idx; updateCarousel();
+  }); });
   window.addEventListener('resize',updateCarousel);
   updateCarousel();
 }
 
 function initCardTriggers(){
-  const cardTriggers=document.querySelectorAll('.deck-card, #featured-work .group, .asset-interactive-trigger');
-  cardTriggers.forEach((card,idx)=>{
+  const deckCards=document.querySelectorAll('.deck-card, .asset-interactive-trigger');
+  deckCards.forEach((card,idx)=>{
     card.style.cursor='pointer';
     card.addEventListener('click',()=>{
       if(document.body.classList.contains('builder-active')) return;
+      const linkedTitle=card.dataset.linkedWork;
+      const linkedCard=linkedTitle?findWorkCardByTitle(linkedTitle):null;
+      if(linkedCard){ openModalFromCard(linkedCard); return; }
       openModal(idx%assetsData.length);
     });
   });
-  const allWorksSection=document.getElementById('all-works');
-  if(allWorksSection){
-    allWorksSection.addEventListener('click',(e)=>{
+  [document.getElementById('featured-work'), document.getElementById('all-works')].forEach(section=>{
+    if(!section) return;
+    section.addEventListener('click',(e)=>{
       if(document.body.classList.contains('builder-active')) return;
       if(e.target.closest('.card-remove-btn')) return;
       const card=e.target.closest('.group');
       if(card) openModalFromCard(card);
+    });
+  });
+  const categoriesGrid=document.getElementById('categories-grid');
+  if(categoriesGrid){
+    categoriesGrid.addEventListener('click',(e)=>{
+      if(document.body.classList.contains('builder-active')) return;
+      if(e.target.closest('.card-remove-btn')) return;
+      const card=e.target.closest('.group');
+      if(!card) return;
+      const h4=card.querySelector('h4');
+      const name=h4?h4.textContent.trim():'';
+      if(name) applyFilterAndMaybeScroll(name,true);
     });
   }
 }
@@ -840,14 +712,105 @@ function initCardTriggers(){
 const REGIONS=['site-header','site-main','site-footer'];
 let saveTimer=null;
 
-function updateAllWorksCount(){
+let activeCategoryFilter='';
+function getCategoryNames(){
+  return Array.from(document.querySelectorAll('#categories-grid > .group')).map(c=>{
+    const h4=c.querySelector('h4');
+    return h4?h4.textContent.trim():'';
+  }).filter(Boolean);
+}
+function renderFilterTabs(){
+  const bar=document.getElementById('filter-tabs-bar');
+  if(!bar) return;
   const grid=document.querySelector('#all-works .grid');
-  if(!grid) return;
-  const count=grid.querySelectorAll(':scope > .group').length;
-  const tab=document.getElementById('all-works-count-tab');
+  const total=grid?grid.querySelectorAll(':scope > .group').length:0;
+  bar.innerHTML='';
+  const makeBtn=(label,filterVal,isActive)=>{
+    const b=document.createElement('button');
+    b.type='button';
+    b.className='px-4 py-2 rounded text-xs font-label-mono uppercase tracking-widest transition-all cursor-pointer '+(isActive?'bg-[#150a0d] border border-red-600 text-white shadow-[0_0_15px_rgba(225,29,72,0.3)]':'bg-[#0d0a0d] border border-red-950/60 text-zinc-400 hover:text-red-300 hover:border-red-900/80');
+    b.textContent=label;
+    b.addEventListener('click',()=>applyFilterAndMaybeScroll(filterVal,false));
+    return b;
+  };
+  const allBtn=makeBtn(`[ ALL (${total}) ]`,'',activeCategoryFilter==='');
+  allBtn.id='all-works-count-tab';
+  bar.appendChild(allBtn);
+  getCategoryNames().forEach(name=>{
+    bar.appendChild(makeBtn(`[ ${name.toUpperCase()} ]`,name,activeCategoryFilter===name));
+  });
+}
+function applyFilter(name){
+  activeCategoryFilter=name||'';
+  const grid=document.querySelector('#all-works .grid');
+  let visible=0, total=0;
+  if(grid){
+    grid.querySelectorAll(':scope > .group').forEach(card=>{
+      total++;
+      const catLabel=card.querySelector('.card-category-label');
+      const cat=catLabel?catLabel.textContent.trim():'';
+      const show=!activeCategoryFilter || cat===activeCategoryFilter;
+      card.style.display=show?'':'none';
+      if(show) visible++;
+    });
+  }
+  renderFilterTabs();
   const label=document.getElementById('all-works-total-label');
-  if(tab) tab.textContent=`[ ALL (${count}) ]`;
-  if(label) label.textContent=`TOTAL REPOSITORY: ${count} ARTIFACTS`;
+  if(label) label.textContent = activeCategoryFilter ? `SHOWING: ${visible} // ${activeCategoryFilter.toUpperCase()}` : `TOTAL REPOSITORY: ${total} ARTIFACTS`;
+}
+function applyFilterAndMaybeScroll(name, scroll){
+  applyFilter(name);
+  if(scroll){
+    const section=document.getElementById('all-works');
+    if(section) section.scrollIntoView({behavior:'smooth', block:'start'});
+  }
+}
+function onCategoriesChanged(){
+  renderFilterTabs();
+  enhanceAllCards();
+  enhanceDeckCards();
+  renderCategoryPreviews();
+}
+function updateAllWorksCount(){ applyFilter(activeCategoryFilter); renderCategoryPreviews(); }
+
+function getCategoryPreviewImages(name){
+  const cards=document.querySelectorAll('#all-works .grid > .group, #featured-work .grid > .group');
+  const images=[];
+  cards.forEach(card=>{
+    const label=card.querySelector('.card-category-label');
+    if(!label || label.textContent.trim()!==name) return;
+    const mainImg=card.querySelector('.img-stage img') || card.querySelector('img');
+    if(mainImg && mainImg.src && mainImg.src.indexOf('placeholder-thumbnail.svg')===-1) images.push(mainImg.src);
+    card.querySelectorAll('.card-gallery-data img').forEach(g=>{ if(g.src) images.push(g.src); });
+  });
+  return images;
+}
+function renderCategoryPreviews(){
+  document.querySelectorAll('#categories-grid > .group').forEach(card=>{
+    const h4=card.querySelector('h4');
+    const name=h4?h4.textContent.trim():'';
+    const preview=card.querySelector('.category-preview');
+    if(!preview) return;
+    if(preview._cpTimer) clearInterval(preview._cpTimer);
+    const images=name?getCategoryPreviewImages(name):[];
+    preview.innerHTML='';
+    if(!images.length) return;
+    const imgs=images.slice(0,6).map((src,i)=>{
+      const im=document.createElement('img');
+      im.src=src; im.alt='';
+      if(i===0) im.classList.add('cp-active');
+      preview.appendChild(im);
+      return im;
+    });
+    if(imgs.length>1){
+      let idx=0;
+      preview._cpTimer=setInterval(()=>{
+        imgs[idx].classList.remove('cp-active');
+        idx=(idx+1)%imgs.length;
+        imgs[idx].classList.add('cp-active');
+      },2600);
+    }
+  });
 }
 
 function applyEditable(){
@@ -861,7 +824,9 @@ function applyEditable(){
       if(el.classList.contains('material-symbols-outlined')) return;
       if(el.closest('#add-work-tile')) return;
       if(el.closest('#add-category-tile')) return;
+      if(el.closest('#add-showcase-tile')) return;
       if(el.closest('.card-remove-btn')) return;
+      if(el.closest('.builder-only-control')) return;
       if(el.closest('#builder-toolbar')) return;
       if(!el.textContent || !el.textContent.trim()) return;
       if(active){
@@ -882,6 +847,230 @@ function applyBuilderVisibility(){
   if(addTile) addTile.style.display=active?'flex':'none';
   const addCategoryTile=document.getElementById('add-category-tile');
   if(addCategoryTile) addCategoryTile.style.display=active?'flex':'none';
+  const addShowcaseTile=document.getElementById('add-showcase-tile');
+  if(addShowcaseTile) addShowcaseTile.style.display=active?'flex':'none';
+  document.querySelectorAll('.builder-only-control').forEach(el=>{
+    el.style.display=active?(el.dataset.showDisplay||'flex'):'none';
+  });
+}
+
+function resetImageTransform(img){
+  img.dataset.panX='0'; img.dataset.panY='0'; img.dataset.zoom='1';
+  img.style.transform='translate(0px,0px) scale(1)';
+}
+function applyImageTransform(img){
+  const x=parseFloat(img.dataset.panX||'0'), y=parseFloat(img.dataset.panY||'0'), z=parseFloat(img.dataset.zoom||'1');
+  img.style.transform=`translate(${x}px,${y}px) scale(${z})`;
+}
+function clampPan(img,x,y,zoom){
+  const stage=img.closest('.img-stage');
+  if(!stage) return {x,y};
+  const rect=stage.getBoundingClientRect();
+  const maxX=(rect.width*(zoom-1))/2;
+  const maxY=(rect.height*(zoom-1))/2;
+  return { x: Math.max(-maxX,Math.min(maxX,x)), y: Math.max(-maxY,Math.min(maxY,y)) };
+}
+function fileToDataUrl(file){
+  return new Promise((resolve,reject)=>{
+    const reader=new FileReader();
+    reader.onerror=reject;
+    reader.onload=()=>{
+      const img=new Image();
+      img.onerror=reject;
+      img.onload=()=>{
+        const maxEdge=1600;
+        let width=img.naturalWidth, height=img.naturalHeight;
+        if(width>maxEdge || height>maxEdge){
+          const scale=maxEdge/Math.max(width,height);
+          width=Math.round(width*scale); height=Math.round(height*scale);
+        }
+        const canvas=document.createElement('canvas');
+        canvas.width=width; canvas.height=height;
+        canvas.getContext('2d').drawImage(img,0,0,width,height);
+        resolve(canvas.toDataURL('image/jpeg',0.85));
+      };
+      img.src=reader.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+let uploadTargetImg=null;
+function getSharedFileInput(){
+  let input=document.getElementById('shared-image-upload-input');
+  if(!input){
+    input=document.createElement('input');
+    input.type='file'; input.accept='image/*'; input.id='shared-image-upload-input';
+    input.style.display='none';
+    document.body.appendChild(input);
+    input.addEventListener('change', async ()=>{
+      const file=input.files && input.files[0];
+      input.value='';
+      if(!file || !uploadTargetImg) return;
+      try{
+        const dataUrl=await fileToDataUrl(file);
+        const targetImg=uploadTargetImg;
+        const stage=targetImg.closest('.img-stage');
+        const hasRealImage = targetImg.src.indexOf('placeholder-thumbnail.svg')===-1;
+        if(hasRealImage && stage){
+          const card=stage.closest('.group');
+          const galleryWrap=card ? ensureGalleryData(card) : null;
+          if(galleryWrap){
+            const extra=document.createElement('img');
+            extra.src=dataUrl; extra.alt='Gallery image';
+            galleryWrap.appendChild(extra);
+          }
+        } else {
+          targetImg.src=dataUrl;
+          resetImageTransform(targetImg);
+        }
+        renderCategoryPreviews();
+        saveRegions();
+      }catch(err){ console.error(err); }
+    });
+  }
+  return input;
+}
+function ensureGalleryData(card){
+  let wrap=card.querySelector('.card-gallery-data');
+  if(!wrap){
+    wrap=document.createElement('div');
+    wrap.className='card-gallery-data';
+    wrap.style.display='none';
+    card.appendChild(wrap);
+  }
+  return wrap;
+}
+function ensureImageStageControls(stage){
+  const img=stage.querySelector('img');
+  if(!img) return;
+  if(img.dataset.panX===undefined) resetImageTransform(img); else applyImageTransform(img);
+  if(!stage.querySelector('.img-upload-btn')){
+    const btn=document.createElement('button');
+    btn.type='button';
+    btn.className='img-upload-btn builder-only-control';
+    btn.style.cssText='display:none;position:absolute;top:8px;left:8px;z-index:30;width:26px;height:26px;border-radius:9999px;background:rgba(0,0,0,0.85);border:1px solid #7f1d1d;align-items:center;justify-content:center;color:#fca5a5;cursor:pointer;';
+    btn.title='Upload image';
+    btn.innerHTML='<span class="material-symbols-outlined" style="font-size:15px;">add_a_photo</span>';
+    stage.appendChild(btn);
+  }
+  if(!stage.querySelector('.img-zoom-slider')){
+    const wrap=document.createElement('div');
+    wrap.className='img-zoom-slider builder-only-control';
+    wrap.style.cssText='display:none;position:absolute;left:8px;right:8px;bottom:8px;z-index:30;align-items:center;gap:6px;background:rgba(0,0,0,0.7);border-radius:6px;padding:4px 8px;';
+    wrap.innerHTML='<input type="range" class="img-zoom-input" min="1" max="2.5" step="0.05" value="'+(img.dataset.zoom||'1')+'" style="flex:1;accent-color:#dc2626;">';
+    stage.appendChild(wrap);
+  } else {
+    const range=stage.querySelector('.img-zoom-input');
+    if(range) range.value=img.dataset.zoom||'1';
+  }
+}
+function ensureCardTagControls(card){
+  const wrap=card.querySelector('.card-tags');
+  if(!wrap) return;
+  if(!wrap.querySelector('.card-tag-add')){
+    const addBtn=document.createElement('button');
+    addBtn.type='button';
+    addBtn.className='card-tag-add builder-only-control';
+    addBtn.dataset.showDisplay='inline-flex';
+    addBtn.style.cssText='display:none;align-items:center;gap:2px;border:1px dashed #7f1d1d;color:#fca5a5;font-family:ui-monospace,monospace;font-size:10px;border-radius:9999px;padding:2px 8px;cursor:pointer;background:transparent;';
+    addBtn.textContent='+ tag';
+    wrap.appendChild(addBtn);
+  }
+}
+function createTagPill(text){
+  const pill=document.createElement('span');
+  pill.className='card-tag';
+  pill.style.cssText='display:inline-flex;align-items:center;gap:4px;border:1px solid #7f1d1d;background:#150a0d;color:#fca5a5;font-family:ui-monospace,monospace;font-size:10px;border-radius:9999px;padding:2px 4px 2px 8px;';
+  const label=document.createElement('span');
+  label.className='card-tag-label';
+  label.textContent=text.startsWith('#')?text:'#'+text;
+  const rm=document.createElement('button');
+  rm.type='button';
+  rm.className='card-tag-remove builder-only-control';
+  rm.dataset.showDisplay='inline-flex';
+  rm.style.cssText='display:none;align-items:center;justify-content:center;width:12px;height:12px;border:none;background:transparent;color:#fca5a5;cursor:pointer;padding:0;font-size:12px;line-height:1;';
+  rm.textContent='×';
+  pill.appendChild(label);
+  pill.appendChild(rm);
+  return pill;
+}
+function ensureCardCategorySelect(card){
+  const label=card.querySelector('.card-category-label');
+  if(!label) return;
+  let select=card.querySelector('.card-category-select');
+  if(!select){
+    select=document.createElement('select');
+    select.className='card-category-select builder-only-control';
+    select.dataset.showDisplay='inline-block';
+    select.style.cssText='display:none;margin-left:6px;background:#150a0d;border:1px solid #7f1d1d;color:#fca5a5;font-family:ui-monospace,monospace;font-size:10px;border-radius:4px;padding:2px 4px;vertical-align:middle;max-width:120px;';
+    label.insertAdjacentElement('afterend', select);
+  }
+  const names=getCategoryNames();
+  const current=label.textContent.trim();
+  select.innerHTML='<option value="">— Uncategorized —</option>'+names.map(n=>'<option value="'+escapeHtml(n)+'">'+escapeHtml(n)+'</option>').join('');
+  select.value=names.includes(current)?current:'';
+}
+function enhanceCard(card){
+  const stage=card.querySelector('.img-stage');
+  if(stage) ensureImageStageControls(stage);
+  ensureCardTagControls(card);
+  ensureCardCategorySelect(card);
+}
+function enhanceAllCards(){
+  document.querySelectorAll('#featured-work .grid > .group, #all-works .grid > .group').forEach(enhanceCard);
+}
+
+function getAllWorkTitles(){
+  const cards=document.querySelectorAll('#featured-work .grid > .group, #all-works .grid > .group');
+  const titles=[];
+  cards.forEach(c=>{
+    const h4=c.querySelector('h4');
+    const t=h4?h4.textContent.trim():'';
+    if(t && titles.indexOf(t)===-1) titles.push(t);
+  });
+  return titles;
+}
+function findWorkCardByTitle(title){
+  const cards=document.querySelectorAll('#featured-work .grid > .group, #all-works .grid > .group');
+  for(const c of cards){
+    const h4=c.querySelector('h4');
+    if(h4 && h4.textContent.trim()===title) return c;
+  }
+  return null;
+}
+function populateDeckWorkSelect(select){
+  const current=select.value;
+  const titles=getAllWorkTitles();
+  select.innerHTML='<option value="">— Choose Work —</option>'+titles.map(t=>'<option value="'+escapeHtml(t)+'">'+escapeHtml(t)+'</option>').join('');
+  select.value=titles.includes(current)?current:(titles.includes(select.dataset.linked||'')?select.dataset.linked:'');
+}
+function linkDeckCardToWork(deckCard, title){
+  deckCard.dataset.linkedWork=title||'';
+  const img=deckCard.querySelector('img');
+  const titleSpan=deckCard.querySelector('.relative.z-10 span:last-child');
+  if(!title){ return; }
+  const workCard=findWorkCardByTitle(title);
+  if(!workCard) return;
+  const workImg=workCard.querySelector('.img-stage img') || workCard.querySelector('img');
+  if(img && workImg) img.src=workImg.src;
+  if(titleSpan) titleSpan.textContent=title;
+}
+function ensureDeckWorkSelect(deckCard){
+  let select=deckCard.querySelector('.deck-card-work-select');
+  if(!select){
+    select=document.createElement('select');
+    select.className='deck-card-work-select builder-only-control';
+    select.dataset.showDisplay='block';
+    select.style.cssText='display:none;position:absolute;top:8px;left:8px;right:8px;z-index:20;background:rgba(10,7,9,0.9);border:1px solid #7f1d1d;color:#fca5a5;font-family:ui-monospace,monospace;font-size:10px;border-radius:4px;padding:4px 6px;';
+    select.addEventListener('mousedown',(e)=>{ e.stopPropagation(); populateDeckWorkSelect(select); });
+    select.addEventListener('click',(e)=>{ e.stopPropagation(); });
+    deckCard.appendChild(select);
+  }
+  select.dataset.linked=deckCard.dataset.linkedWork||'';
+  populateDeckWorkSelect(select);
+}
+function enhanceDeckCards(){
+  document.querySelectorAll('.deck-card').forEach(ensureDeckWorkSelect);
 }
 
 function renumberCategories(){
@@ -940,7 +1129,31 @@ function buildNewCard(){
   if(descEl) descEl.textContent='Click to edit this description.';
   if(specSpan) specSpan.textContent='— Tris // — PBR';
   const img=card.querySelector('img');
-  if(img){ img.src='assets/placeholder-thumbnail.svg'; img.alt='New Work'; }
+  if(img){ img.src='assets/placeholder-thumbnail.svg'; img.alt='New Work'; resetImageTransform(img); }
+  card.querySelectorAll('.card-gallery-data img').forEach(el=>el.remove());
+  card.querySelectorAll('.card-tags .card-tag').forEach(el=>el.remove());
+  enhanceCard(card);
+  return card;
+}
+
+function buildNewShowcaseCard(){
+  const grid=document.querySelector('#featured-work .grid');
+  const template=grid ? grid.querySelector('.group') : null;
+  if(!template) return null;
+  const card=template.cloneNode(true);
+  const catLabel=card.querySelector('.card-category-label');
+  const titleEl=card.querySelector('h4');
+  const descEl=card.querySelector('p');
+  if(catLabel) catLabel.textContent='UNCATEGORIZED';
+  if(titleEl) titleEl.textContent='New Work';
+  if(descEl) descEl.textContent='Click to edit this description.';
+  const img=card.querySelector('img');
+  if(img){ img.src='assets/placeholder-thumbnail.svg'; img.alt='New Work'; resetImageTransform(img); }
+  card.querySelectorAll('.card-gallery-data img').forEach(el=>el.remove());
+  card.querySelectorAll('.card-tags .card-tag').forEach(el=>el.remove());
+  const select=card.querySelector('.card-category-select');
+  if(select) select.remove();
+  enhanceCard(card);
   return card;
 }
 
@@ -966,10 +1179,13 @@ async function exportSite(){
       el.removeAttribute('contenteditable');
     });
     cleanClone.querySelectorAll('.card-remove-btn').forEach(el=>el.remove());
+    cleanClone.querySelectorAll('.builder-only-control').forEach(el=>el.remove());
     const tile=cleanClone.querySelector('#add-work-tile');
     if(tile) tile.remove();
     const categoryTile=cleanClone.querySelector('#add-category-tile');
     if(categoryTile) categoryTile.remove();
+    const showcaseTile=cleanClone.querySelector('#add-showcase-tile');
+    if(showcaseTile) showcaseTile.remove();
     targetEl.innerHTML=cleanClone.innerHTML;
   });
   const finalHtml='<!DOCTYPE html>\n'+doc.documentElement.outerHTML;
@@ -1001,8 +1217,11 @@ function initBuilder(){
     }
   }
   syncToggleLabel();
+  enhanceAllCards();
+  enhanceDeckCards();
   applyEditable();
   applyBuilderVisibility();
+  renderFilterTabs();
 
   if(toggleBtn){
     toggleBtn.addEventListener('click',()=>{
@@ -1010,6 +1229,8 @@ function initBuilder(){
       const active=document.body.classList.contains('builder-active');
       localStorage.setItem('builder:active',active?'1':'0');
       syncToggleLabel();
+      enhanceAllCards();
+  enhanceDeckCards();
       applyEditable();
       applyBuilderVisibility();
     });
@@ -1063,6 +1284,18 @@ function initBuilder(){
       addCategoryTile.parentNode.insertBefore(card,addCategoryTile);
       applyEditable();
       renumberCategories();
+      onCategoriesChanged();
+      saveRegions();
+    });
+  }
+
+  const addShowcaseTile=document.getElementById('add-showcase-tile');
+  if(addShowcaseTile){
+    addShowcaseTile.addEventListener('click',()=>{
+      const card=buildNewShowcaseCard();
+      if(!card) return;
+      addShowcaseTile.parentNode.insertBefore(card,addShowcaseTile);
+      applyEditable();
       saveRegions();
     });
   }
@@ -1075,10 +1308,73 @@ function initBuilder(){
       const inCategories=card && card.closest('#categories-grid');
       if(card){
         card.remove();
-        if(inCategories){ renumberCategories(); } else { updateAllWorksCount(); }
+        if(inCategories){ renumberCategories(); onCategoriesChanged(); } else { updateAllWorksCount(); }
         saveRegions();
       }
+      return;
     }
+    const uploadBtn=e.target.closest('.img-upload-btn');
+    if(uploadBtn){
+      const stage=uploadBtn.closest('.img-stage');
+      const img=stage && stage.querySelector('img');
+      if(img){ uploadTargetImg=img; getSharedFileInput().click(); }
+      return;
+    }
+    const tagAddBtn=e.target.closest('.card-tag-add');
+    if(tagAddBtn){
+      const wrap=tagAddBtn.closest('.card-tags');
+      const pill=createTagPill('tag');
+      wrap.insertBefore(pill,tagAddBtn);
+      applyEditable();
+      saveRegions();
+      const label=pill.querySelector('.card-tag-label');
+      if(label){ label.focus(); const sel=window.getSelection(); if(sel){ sel.selectAllChildren(label); } }
+      return;
+    }
+    const tagRemoveBtn=e.target.closest('.card-tag-remove');
+    if(tagRemoveBtn){
+      const pill=tagRemoveBtn.closest('.card-tag');
+      if(pill){ pill.remove(); saveRegions(); }
+      return;
+    }
+  });
+
+  document.addEventListener('change',(e)=>{
+    if(!document.body.classList.contains('builder-active')) return;
+    if(e.target.matches('.card-category-select')){
+      const card=e.target.closest('.group');
+      const label=card && card.querySelector('.card-category-label');
+      if(label) label.textContent=e.target.value||'UNCATEGORIZED';
+      updateAllWorksCount();
+      saveRegions();
+      return;
+    }
+    if(e.target.matches('.img-zoom-input')){
+      saveRegions();
+    }
+    if(e.target.matches('.deck-card-work-select')){
+      const deckCard=e.target.closest('.deck-card');
+      if(deckCard){ linkDeckCardToWork(deckCard, e.target.value); saveRegions(); }
+      return;
+    }
+  });
+
+  document.addEventListener('input',(e)=>{
+    if(!document.body.classList.contains('builder-active')) return;
+    if(e.target.matches('.img-zoom-input')){
+      const stage=e.target.closest('.img-stage');
+      const img=stage && stage.querySelector('img');
+      if(img){
+        const zoom=parseFloat(e.target.value);
+        const x=parseFloat(img.dataset.panX||'0'), y=parseFloat(img.dataset.panY||'0');
+        const clamped=clampPan(img,x,y,zoom);
+        img.dataset.zoom=String(zoom); img.dataset.panX=String(clamped.x); img.dataset.panY=String(clamped.y);
+        applyImageTransform(img);
+      }
+      return;
+    }
+    if(e.target.closest('#categories-grid')){ onCategoriesChanged(); }
+    scheduleSave();
   });
 
   document.addEventListener('click',(e)=>{
@@ -1087,10 +1383,31 @@ function initBuilder(){
     if(link) e.preventDefault();
   },true);
 
-  document.addEventListener('input',()=>{
+  let dragState=null;
+  document.addEventListener('pointerdown',(e)=>{
     if(!document.body.classList.contains('builder-active')) return;
-    scheduleSave();
+    if(e.target.closest('.builder-only-control')) return;
+    const stage=e.target.closest('.img-stage');
+    if(!stage) return;
+    const img=stage.querySelector('img');
+    if(!img) return;
+    dragState={ stage, img, startX:e.clientX, startY:e.clientY, baseX:parseFloat(img.dataset.panX||'0'), baseY:parseFloat(img.dataset.panY||'0') };
+    try{ stage.setPointerCapture(e.pointerId); }catch(err){}
+    stage.style.cursor='grabbing';
   });
+  document.addEventListener('pointermove',(e)=>{
+    if(!dragState) return;
+    const {img,startX,startY,baseX,baseY}=dragState;
+    const zoom=parseFloat(img.dataset.zoom||'1');
+    const clamped=clampPan(img, baseX+(e.clientX-startX), baseY+(e.clientY-startY), zoom);
+    img.dataset.panX=String(clamped.x); img.dataset.panY=String(clamped.y);
+    applyImageTransform(img);
+  });
+  const endDrag=()=>{
+    if(dragState){ dragState.stage.style.cursor=''; dragState=null; saveRegions(); }
+  };
+  document.addEventListener('pointerup',endDrag);
+  document.addEventListener('pointercancel',endDrag);
 }
 
 restoreRegions();

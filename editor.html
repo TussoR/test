@@ -168,6 +168,37 @@
       color: #f87171;
       border-color: #b91c1c;
     }
+    #builder-publish-btn {
+      display: none;
+      padding: 10px 18px;
+      border-radius: 6px;
+      background: #7f1d1d;
+      border: 1px solid #dc2626;
+      color: #fff;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+    #builder-publish-btn:hover { background: #b91c1c; }
+    #builder-publish-btn:disabled { opacity: 0.6; cursor: wait; }
+    body.panel-mode #builder-publish-btn { display: inline-block; }
+    body.panel-mode #builder-export-btn { display: none; }
+    #builder-status {
+      display: none;
+      max-width: 320px;
+      padding: 8px 12px;
+      border-radius: 6px;
+      background: #0a0709;
+      border: 1px solid #3f1014;
+      color: #d4d4d8;
+      font-size: 11px;
+      line-height: 1.4;
+    }
+    #builder-status.ok { display: block; border-color: #15803d; color: #4ade80; }
+    #builder-status.error { display: block; border-color: #b91c1c; color: #f87171; }
+    #builder-status.busy { display: block; }
   </style>
 <!-- Three.js CDN for standalone scripts and custom element simulation if necessary -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -505,7 +536,9 @@
 <div id="asset-lightbox-modal" class="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 transition-all duration-300 opacity-0 pointer-events-none" role="dialog" aria-modal="true" aria-hidden="true"><div id="modal-backdrop-trigger" class="absolute inset-0 bg-black/80 backdrop-blur-md cursor-pointer transition-opacity duration-300"></div><div class="relative z-10 w-full max-w-[92rem] bg-[#0c090c] border border-red-900/80 rounded-2xl overflow-hidden shadow-[0_0_50px_rgba(225,29,72,0.35)] flex flex-col md:flex-row max-h-[95vh]"><div class="relative w-full md:w-[70%] aspect-square md:aspect-auto bg-black/70 flex items-center justify-center overflow-hidden border-b md:border-b-0 md:border-r border-red-950/60"><img id="modal-asset-img" src="" alt="" class="w-full h-full object-cover transition-transform duration-500"><div class="absolute bottom-4 right-4 z-20 flex items-center gap-1 bg-[#0a0709]/90 border border-red-950 rounded p-1"><button type="button" id="modal-prev-btn" class="p-1.5 text-zinc-400 hover:text-white transition-colors"><span class="material-symbols-outlined text-xl">chevron_left</span></button><button type="button" id="modal-next-btn" class="p-1.5 text-zinc-400 hover:text-white transition-colors"><span class="material-symbols-outlined text-xl">chevron_right</span></button></div></div><div class="w-full md:w-[30%] p-6 sm:p-8 flex flex-col justify-between overflow-y-auto"><div class="flex flex-col gap-4"><div class="flex items-center justify-between"><span id="modal-category-badge" class="font-label-mono text-[10px] text-red-400 tracking-widest uppercase bg-[#150a0d] border border-red-950 px-2.5 py-0.5 rounded">MELEE // 2025</span><button type="button" id="modal-close-btn" class="w-8 h-8 rounded bg-[#150a0d] border border-red-950/80 flex items-center justify-center text-zinc-400 hover:text-white hover:border-red-600 transition-colors"><span class="material-symbols-outlined text-base">close</span></button></div><h3 id="modal-title" class="font-headline-md text-2xl text-[#f4f4f5] tracking-wide uppercase mt-1">Lorem Ipsum 01</h3><div class="flex items-center gap-4 text-xs font-label-mono text-zinc-400 border-y border-red-950/50 py-2.5"><div class="flex items-center gap-1.5"><span class="text-red-500">◈</span><span id="modal-tris-spec" class="">42k Tris</span></div><div class="flex items-center gap-1.5"><span class="text-red-500">◈</span><span id="modal-texture-spec" class="">4K PBR</span></div></div><p id="modal-desc" class="font-body-md text-zinc-300 text-sm font-light leading-relaxed">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt.</p><div id="modal-tags" class="flex flex-wrap gap-1.5"></div><div id="modal-gallery-strip" class="flex flex-wrap gap-2"></div></div><div class="pt-6 border-t border-red-950/60 mt-6 flex items-center justify-between"><span class="font-label-mono text-[10px] text-zinc-500 uppercase">STATUS: READY FOR PRODUCTION</span><a href="#contact-teaser" id="modal-inquire-link" class="px-4 py-2 bg-red-700 hover:bg-red-600 text-white rounded font-label-mono text-xs uppercase tracking-widest transition-colors">INQUIRE ASSET</a></div></div></div></div>
 <div id="builder-toolbar">
 <button type="button" id="builder-reset-btn">Reset</button>
+<div id="builder-status" role="status"></div>
 <button type="button" id="builder-export-btn">⬇ Export index.html</button>
+<button type="button" id="builder-publish-btn">🚀 Publish</button>
 <button type="button" id="builder-toggle-btn">✎ Edit Mode</button>
 </div>
 <script>(function(){
@@ -780,8 +813,9 @@ function getCategoryPreviewImages(name){
     const label=card.querySelector('.card-category-label');
     if(!label || label.textContent.trim()!==name) return;
     const mainImg=card.querySelector('.img-stage img') || card.querySelector('img');
-    if(mainImg && mainImg.src && mainImg.src.indexOf('placeholder-thumbnail.svg')===-1) images.push(mainImg.src);
-    card.querySelectorAll('.card-gallery-data img').forEach(g=>{ if(g.src) images.push(g.src); });
+    const mainSrc=mainImg && mainImg.getAttribute('src');
+    if(mainSrc && mainSrc.indexOf('placeholder-thumbnail.svg')===-1) images.push(mainSrc);
+    card.querySelectorAll('.card-gallery-data img').forEach(g=>{ const src=g.getAttribute('src'); if(src) images.push(src); });
   });
   return images;
 }
@@ -907,7 +941,12 @@ function getSharedFileInput(){
       input.value='';
       if(!file || !uploadTargetImg) return;
       try{
-        const dataUrl=await fileToDataUrl(file);
+        let dataUrl=await fileToDataUrl(file);
+        if(panelMode){
+          setStatus('busy','Uploading image…');
+          dataUrl=await uploadImage(dataUrl, file.name);
+          setStatus('','');
+        }
         const targetImg=uploadTargetImg;
         const stage=targetImg.closest('.img-stage');
         const hasRealImage = targetImg.src.indexOf('placeholder-thumbnail.svg')===-1;
@@ -925,7 +964,7 @@ function getSharedFileInput(){
         }
         renderCategoryPreviews();
         saveRegions();
-      }catch(err){ console.error(err); }
+      }catch(err){ console.error(err); setStatus('error','Image upload failed: '+err.message); }
     });
   }
   return input;
@@ -1052,7 +1091,7 @@ function linkDeckCardToWork(deckCard, title){
   const workCard=findWorkCardByTitle(title);
   if(!workCard) return;
   const workImg=workCard.querySelector('.img-stage img') || workCard.querySelector('img');
-  if(img && workImg) img.src=workImg.src;
+  if(img && workImg) img.setAttribute('src', workImg.getAttribute('src'));
   if(titleSpan) titleSpan.textContent=title;
 }
 function ensureDeckWorkSelect(deckCard){
@@ -1107,8 +1146,77 @@ function scheduleSave(){ clearTimeout(saveTimer); saveTimer=setTimeout(saveRegio
 function restoreRegions(){
   REGIONS.forEach(id=>{
     const saved=localStorage.getItem('builder:'+id);
-    if(saved!==null){ const el=document.getElementById(id); if(el) el.innerHTML=saved; }
+    const html=saved!==null ? saved : (publishedContent && publishedContent[id]);
+    if(typeof html==='string'){ const el=document.getElementById(id); if(el) el.innerHTML=html; }
   });
+}
+
+// Local panel mode ("Siteyi Duzenle.bat"): publish straight to the live site.
+let panelMode=false;
+let publishedContent=null;
+async function detectPanel(){
+  try{
+    const resp=await fetch('/__panel/status',{cache:'no-store'});
+    panelMode=resp.ok && (await resp.json()).panel===true;
+  }catch(err){ panelMode=false; }
+  if(!panelMode) return;
+  document.body.classList.add('panel-mode');
+  try{
+    const resp=await fetch('panel/content.json',{cache:'no-store'});
+    if(resp.ok) publishedContent=await resp.json();
+  }catch(err){ publishedContent=null; }
+}
+async function uploadImage(dataUrl, originalName){
+  const blob=await (await fetch(dataUrl)).blob();
+  const base=(originalName||'image').replace(/.[^.]+$/,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,40)||'image';
+  const name=base+'-'+Date.now().toString(36)+'.jpg';
+  const resp=await fetch('/__panel/upload?name='+encodeURIComponent(name),{method:'POST',body:blob});
+  const result=await resp.json();
+  if(!resp.ok || !result.ok) throw new Error(result.error||'upload failed');
+  return result.path;
+}
+function setStatus(kind, text){
+  const el=document.getElementById('builder-status');
+  if(!el) return;
+  el.className=kind||'';
+  el.textContent=text||'';
+}
+function getContentSnapshot(){
+  const content={};
+  REGIONS.forEach(id=>{
+    const el=document.getElementById(id);
+    if(!el) return;
+    const clone=el.cloneNode(true);
+    clone.querySelectorAll('[data-bd-editable]').forEach(n=>{ n.removeAttribute('data-bd-editable'); n.removeAttribute('contenteditable'); });
+    content[id]=clone.innerHTML;
+  });
+  return content;
+}
+async function writePanelFile(file, body){
+  const resp=await fetch('/__panel/write?file='+encodeURIComponent(file),{method:'POST',body});
+  if(!resp.ok) throw new Error('Could not save '+file);
+}
+async function publishSite(){
+  saveRegions();
+  setStatus('busy','Publishing… please wait.');
+  try{
+    const html=await buildExportHtml();
+    await writePanelFile('index.html', html);
+    await writePanelFile('panel/content.json', JSON.stringify(getContentSnapshot()));
+    const resp=await fetch('/__panel/publish',{method:'POST'});
+    const result=await resp.json();
+    if(!result.ok){
+      console.error(result.log);
+      setStatus('error','Publishing failed at step "'+(result.step||'?')+'". Check your internet connection and try again. If it keeps failing, send a screenshot of the black panel window to your developer.');
+      return;
+    }
+    REGIONS.forEach(id=>localStorage.removeItem('builder:'+id));
+    setStatus('ok','✓ Published! The live site updates in about 1–2 minutes.');
+    setTimeout(()=>setStatus('',''),10000);
+  }catch(err){
+    console.error(err);
+    setStatus('error','Publishing failed: '+err.message+'. Is the black panel window still open?');
+  }
 }
 
 function buildNewCard(){
@@ -1157,18 +1265,11 @@ function buildNewShowcaseCard(){
   return card;
 }
 
-async function exportSite(){
-  let templateHtml;
-  try{
-    const resp=await fetch('index.html');
-    if(!resp.ok) throw new Error('fetch failed');
-    templateHtml=await resp.text();
-  }catch(err){
-    alert('Could not load index.html as a template. Make sure this page is opened via a local server (not double-clicked), from the same folder as index.html.');
-    return;
-  }
-  const doc=document.implementation.createHTMLDocument('');
-  doc.documentElement.innerHTML=new DOMParser().parseFromString(templateHtml,'text/html').documentElement.innerHTML;
+async function buildExportHtml(){
+  const resp=await fetch('index.html',{cache:'no-store'});
+  if(!resp.ok) throw new Error('could not load index.html');
+  const templateHtml=await resp.text();
+  const doc=new DOMParser().parseFromString(templateHtml,'text/html');
   REGIONS.forEach(id=>{
     const liveEl=document.getElementById(id);
     const targetEl=doc.getElementById(id);
@@ -1188,7 +1289,17 @@ async function exportSite(){
     if(showcaseTile) showcaseTile.remove();
     targetEl.innerHTML=cleanClone.innerHTML;
   });
-  const finalHtml='<!DOCTYPE html>\n'+doc.documentElement.outerHTML;
+  return '<!DOCTYPE html>\n'+doc.documentElement.outerHTML;
+}
+
+async function exportSite(){
+  let finalHtml;
+  try{
+    finalHtml=await buildExportHtml();
+  }catch(err){
+    alert('Could not load index.html as a template. Make sure this page is opened via a local server (not double-clicked), from the same folder as index.html.');
+    return;
+  }
   const blob=new Blob([finalHtml],{type:'text/html'});
   const url=URL.createObjectURL(blob);
   const a=document.createElement('a');
@@ -1241,6 +1352,14 @@ function initBuilder(){
       const original=exportBtn.textContent;
       exportBtn.textContent='Exporting...';
       exportSite().finally(()=>{ exportBtn.textContent=original; });
+    });
+  }
+
+  const publishBtn=document.getElementById('builder-publish-btn');
+  if(publishBtn){
+    publishBtn.addEventListener('click',()=>{
+      publishBtn.disabled=true;
+      publishSite().finally(()=>{ publishBtn.disabled=false; });
     });
   }
 
@@ -1410,13 +1529,15 @@ function initBuilder(){
   document.addEventListener('pointercancel',endDrag);
 }
 
-restoreRegions();
-initEmber();
-initCarousel();
-initModal();
-initCardTriggers();
-updateAllWorksCount();
-initBuilder();
+detectPanel().then(()=>{
+  restoreRegions();
+  initEmber();
+  initCarousel();
+  initModal();
+  initCardTriggers();
+  updateAllWorksCount();
+  initBuilder();
+});
 
 })();</script>
 

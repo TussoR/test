@@ -1,5 +1,5 @@
 # Portfolio edit panel: serves the site locally, saves edits and publishes them with git.
-# Started by "Siteyi Duzenle.bat". Keep this file ASCII-only (Windows PowerShell 5.1 reads it as ANSI).
+# Started by "Edit Site.bat". Keep this file ASCII-only (Windows PowerShell 5.1 reads it as ANSI).
 
 param([switch]$NoBrowser)
 
@@ -107,16 +107,16 @@ function Handle-Request($ctx) {
     $full = Resolve-SitePath "$UploadDir/$name"
     [IO.Directory]::CreateDirectory([IO.Path]::GetDirectoryName($full)) | Out-Null
     [IO.File]::WriteAllBytes($full, (Read-Body $req))
-    Write-Host "  Gorsel eklendi: $UploadDir/$name"
+    Write-Host "  Image added: $UploadDir/$name"
     Send-Json $ctx 200 @{ ok = $true; path = "$UploadDir/$name" }
     return
   }
 
   if ($req.HttpMethod -eq 'POST' -and $path -eq '/__panel/publish') {
-    Write-Host '  Yayinlaniyor...'
+    Write-Host '  Publishing...'
     $result = Publish-Site
-    if ($result.ok) { Write-Host '  Yayinlandi.' -ForegroundColor Green }
-    else { Write-Host "  Yayinlama basarisiz ($($result.step)):`n$($result.log -join "`n")" -ForegroundColor Red }
+    if ($result.ok) { Write-Host '  Published.' -ForegroundColor Green }
+    else { Write-Host "  Publish failed ($($result.step)):`n$($result.log -join "`n")" -ForegroundColor Red }
     Send-Json $ctx 200 $result
     return
   }
@@ -141,8 +141,8 @@ function Handle-Request($ctx) {
 
 # --- startup ---
 Write-Host ''
-Write-Host '  PORTFOLYO DUZENLEME PANELI' -ForegroundColor Red
-Write-Host '  -------------------------'
+Write-Host '  PORTFOLIO EDIT PANEL' -ForegroundColor Red
+Write-Host '  --------------------'
 
 # If the panel is already running, just open it again.
 try {
@@ -154,13 +154,13 @@ try {
 } catch {}
 
 if (-not (Get-Command git -ErrorAction SilentlyContinue)) {
-  Write-Host '  Git bulunamadi. Lutfen https://git-scm.com adresinden Git kurun.' -ForegroundColor Red
+  Write-Host '  Git was not found. Please install Git from https://git-scm.com' -ForegroundColor Red
   exit 1
 }
 
-Write-Host '  Son surum indiriliyor...'
+Write-Host '  Downloading the latest version...'
 $pull = Invoke-Git @('pull', '--rebase', '--autostash')
-if ($pull.Code -ne 0) { Write-Host "  Uyari: guncelleme alinamadi (internet?).`n$($pull.Output)" -ForegroundColor Yellow }
+if ($pull.Code -ne 0) { Write-Host "  Warning: could not get updates (check your internet connection).`n$($pull.Output)" -ForegroundColor Yellow }
 
 $listener = $null
 for ($port = $StartPort; $port -lt $StartPort + 10; $port++) {
@@ -168,11 +168,11 @@ for ($port = $StartPort; $port -lt $StartPort + 10; $port++) {
   $candidate.Prefixes.Add("http://localhost:$port/")
   try { $candidate.Start(); $listener = $candidate; break } catch { $candidate.Close() }
 }
-if (-not $listener) { Write-Host '  Bos port bulunamadi.' -ForegroundColor Red; exit 1 }
+if (-not $listener) { Write-Host '  No free port found.' -ForegroundColor Red; exit 1 }
 
 $url = "http://localhost:$port/editor.html"
-Write-Host "  Panel acildi: $url" -ForegroundColor Green
-Write-Host '  Duzenleme bitene kadar bu pencereyi KAPATMAYIN.'
+Write-Host "  Editor is open: $url" -ForegroundColor Green
+Write-Host '  Do NOT close this window until you are done editing.'
 Write-Host ''
 if (-not $NoBrowser) { Start-Process $url }
 
@@ -180,7 +180,7 @@ while ($listener.IsListening) {
   $ctx = $listener.GetContext()
   try { Handle-Request $ctx }
   catch {
-    Write-Host "  Hata: $($_.Exception.Message)" -ForegroundColor Red
+    Write-Host "  Error: $($_.Exception.Message)" -ForegroundColor Red
     try { Send-Json $ctx 500 @{ ok = $false; error = $_.Exception.Message } } catch {}
   }
 }

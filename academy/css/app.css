@@ -357,7 +357,7 @@ label.field { display: block; font-size: 13px; color: var(--muted); margin-botto
 .checks li .i { width: 18px; flex: none; text-align: center; }
 .vocab-table { width: 100%; border-collapse: collapse; font-size: 14px; }
 .vocab-table th, .vocab-table td { padding: 8px 10px; border-bottom: 1px solid var(--border); text-align: left; }
-.vocab-table th { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .05em; font-weight: 500; }
+.vocab-table th { color: var(--muted); font-size: 12px; letter-spacing: .05em; font-weight: 500; }
 .vocab-table td.ja { font-family: var(--jp); font-size: 16px; color: var(--accent-2); }
 .vocab-table td.ro { color: var(--muted); font-style: italic; }
 .speak { background: none; border: 0; cursor: pointer; color: var(--muted); padding: 2px 4px; }

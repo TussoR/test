@@ -65,7 +65,7 @@ const EXC_TREE = {
 };
 
 const BUILTIN_STATIC = new Set(['Console', 'Math', 'MathF', 'int', 'double', 'float', 'decimal', 'long', 'string', 'String', 'bool', 'char', 'Char', 'Convert',
-  'Array', 'Enumerable', 'Environment', 'File', 'Path', 'Int32', 'Double', 'Boolean', 'StringSplitOptions', 'Directory', 'Enum', 'object', 'Object', 'Thread', 'Task', 'DateTime', 'TimeSpan', 'StringComparison', 'MidpointRounding']);
+  'Array', 'Enumerable', 'Environment', 'CultureInfo', 'NumberStyles', 'File', 'Path', 'Int32', 'Double', 'Boolean', 'StringSplitOptions', 'Directory', 'Enum', 'object', 'Object', 'Thread', 'Task', 'DateTime', 'TimeSpan', 'StringComparison', 'MidpointRounding']);
 
 const DEFAULT_MSGS = {
   FormatException: 'One of the identified items was in an invalid format.',
@@ -1236,6 +1236,8 @@ export class Interpreter {
       StringSplitOptions: { RemoveEmptyEntries: 'RemoveEmptyEntries', None: 'None', TrimEntries: 'TrimEntries' },
       StringComparison: { OrdinalIgnoreCase: 'OrdinalIgnoreCase', Ordinal: 'Ordinal', CurrentCultureIgnoreCase: 'OrdinalIgnoreCase', InvariantCultureIgnoreCase: 'OrdinalIgnoreCase' },
       MidpointRounding: { AwayFromZero: 'AwayFromZero', ToEven: 'ToEven' },
+      CultureInfo: { InvariantCulture: 'InvariantCulture', CurrentCulture: 'InvariantCulture' },
+      NumberStyles: { Any: 'Any', Float: 'Float', Integer: 'Integer' },
     };
     if (C[t] && name in C[t]) return C[t][name];
     if (t === 'Console' && ['WriteLine', 'Write', 'ReadLine', 'Clear', 'ReadKey'].includes(name)) return new MethodGroup(name, { builtin: 'Console' });
@@ -1811,7 +1813,7 @@ export class Interpreter {
         break;
       }
       case 'int': case 'long': case 'short': case 'byte':
-        if (name === 'Parse') { need(1); return this.parseInt(vals[0], e); }
+        if (name === 'Parse') { need(1, 2, 3); return this.parseInt(vals[0], e); }
         if (name === 'TryParse') {
           need(2);
           const slot = vals[1];
@@ -1820,10 +1822,10 @@ export class Interpreter {
         if (name === 'IsEven') return num(vals[0]) % 2 === 0;
         break;
       case 'double': case 'float': case 'decimal':
-        if (name === 'Parse') { need(1); return this.parseDouble(vals[0], e); }
+        if (name === 'Parse') { need(1, 2, 3); return this.parseDouble(vals[0], e); }
         if (name === 'TryParse') {
-          need(2);
-          const slot = vals[1];
+          need(2, 4);
+          const slot = vals[n - 1];
           try { slot.value = this.parseDouble(vals[0], e); return true; } catch (err) { if (err instanceof CsThrow) { slot.value = new Dbl(0); return false; } throw err; }
         }
         if (name === 'IsNaN') return Number.isNaN(num(vals[0]));
@@ -2060,7 +2062,7 @@ export class Interpreter {
     };
     // tüm nesneler için ortak
     if (name === 'ToString') {
-      if (n === 1 && isNum(v) && !(v instanceof Chr)) return this.formatWith(v, vals[0], e);
+      if ((n === 1 || n === 2) && isNum(v) && !(v instanceof Chr) && typeof vals[0] === 'string' && vals[0] !== 'InvariantCulture') return this.formatWith(v, vals[0], e);
       if (v instanceof CsObject) return this.objToString(v);
       return toStr(v, this);
     }

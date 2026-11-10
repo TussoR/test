@@ -422,7 +422,7 @@ Console.WriteLine(Project(new Vec3(1, -5, -1), 10, 500, 400, 300));
 Console.WriteLine(Project(new Vec3(1, 2, 3), 10, 500, 400, 300));`, expect: '(400.0, 300.0)\n(450.0, 275.0)\n(500.0, 400.0)\n(441.7, 175.0)', msg: 'Derinliğe bölme ve Y ekseninin ters çevrilmesi doğru olmalı' },
           { type: 'harness', append: cs`Console.WriteLine(Project(new Vec3(0, -10, 0), 10, 500, 400, 300) == null);
 Console.WriteLine(Project(new Vec3(3, -12, 1), 10, 500, 400, 300) == null);
-Console.WriteLine(Project(new Vec3(0, -9, 0), 10, 500, 400, 300) == null);`, expect: 'True\nTrue\nFalse', msg: 'Kameranın arkasındaki (derinlik < 0.1) noktalar için null döndürmeli' },
+Console.WriteLine(Project(new Vec3(0, -9, 0), 10, 500, 400, 300) == null);`, expect: 'True\nTrue\nFalse', msg: 'Kameranın arkasındaki (derinlik 0.1 altı) noktalar için null döndürmeli' },
           { type: 'harness', append: cs`Console.WriteLine(Project(new Vec3(1, 0, 1), 5, 200, 0, 0));`, expect: '(40.0, -40.0)', msg: 'Parametreler (camDist, focal, cx, cy) gerçekten kullanılmalı' },
         ],
         hints: [

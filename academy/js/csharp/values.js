@@ -109,8 +109,8 @@ export function formatNumber(v, fmt) {
 
 function fixed(x, p) {
   // toFixed, ±0.5 sınırlarında IEEE doğrulukta çalışır (.NET Core 3+ ile aynı)
-  const s = x.toFixed(Math.min(p, 100));
-  return s === '-0' || /^-0\.0*$/.test(s) ? s.slice(1) : s;
+  // .NET Core 3.0+ gibi: negatif küçük değerler işaretini korur (-0.001 → "-0.00")
+  return x.toFixed(Math.min(p, 100));
 }
 
 /** Konsola yazdırılan dize karşılığı (C# ToString()). */

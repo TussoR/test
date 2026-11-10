@@ -91,7 +91,7 @@ export default {
     'MouseDown / MouseMove / MouseUp olaylarını bir durum makinesiyle (state machine) yönetmek',
     'Seçim vurgusu ve Delete tuşu ile silme gibi gerçek CAD etkileşimlerini uygulamak',
   ],
-  skills: ['Windows Forms', 'System.Drawing (Graphics, Pen, PointF)', 'Soyut sınıflar ve override', 'List&lt;Shape&gt; belge modeli', 'Hit testing geometrisi', 'Olay işleyiciler', 'Durum makinesi', 'Double buffering'],
+  skills: ['Windows Forms', 'System.Drawing (Graphics, Pen, PointF)', 'Soyut sınıflar ve override', 'Shape listesi ile belge modeli', 'Hit testing geometrisi', 'Olay işleyiciler', 'Durum makinesi', 'Double buffering'],
   steps: [
     {
       title: 'Adım 1 — Visual Studio\'da projeyi kur',

@@ -321,7 +321,7 @@ Console.WriteLine(c2.Volume().ToString("F2") + " " + c2.SurfaceArea().ToString("
 var c3 = new Cylinder("C", new Vec3(0, 0, 0), 3, 1);
 Console.WriteLine(c3.Volume().ToString("F2") + " " + c3.SurfaceArea().ToString("F2"));`, expect: '3.14 14.14\n28.27 75.40', msg: 'Silindir: hacim π·r²·h, alan iki kapak + yan yüzey' },
           { type: 'harness', append: cs`var list = new List<Solid> { new Sphere("a", new Vec3(0, 0, 0), 1), new Cylinder("b", new Vec3(0, 0, 0), 1, 1) };
-foreach (Solid x in list) Console.WriteLine(x.Kind + " " + x.Volume().ToString("F2"));`, expect: 'Sphere 4.19\nCylinder 3.14', msg: 'List<Solid> üzerinden çok biçimli çağrılar çalışmalı' },
+foreach (Solid x in list) Console.WriteLine(x.Kind + " " + x.Volume().ToString("F2"));`, expect: 'Sphere 4.19\nCylinder 3.14', msg: 'Solid listesi üzerinden çok biçimli çağrılar çalışmalı' },
         ],
         hints: [
           'C#\'ta üs operatörü yok; <code>r³</code> için <code>Radius * Radius * Radius</code> yaz (ya da <code>Math.Pow(Radius, 3)</code>).',

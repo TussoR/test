@@ -63,10 +63,10 @@ export default {
     'switch ile işlem seçmek ve her işlemi ayrı bir fonksiyona taşımak',
     'Sıfıra bölme gibi hatalı durumları exception (istisna) ile bildirmek ve yakalamak',
     'Kullanıcı q yazana kadar çalışan bir komut döngüsü kurmak',
-    'Hesaplama geçmişini List<string> içinde tutmak ve listelemek',
+    'Hesaplama geçmişini bir string listesinde (List) tutmak ve listelemek',
     'Aynı mantığın bir WinForms arayüzüne nasıl bağlandığını anlamak (mantık / arayüz ayrımı)',
   ],
-  skills: ['Console.ReadLine', 'double.Parse / TryParse', 'switch', 'Fonksiyonlar ve dönüş değerleri', 'try / catch / throw', 'while döngüsü', 'string.Split', 'List&lt;string&gt;', 'Mantık / arayüz ayrımı'],
+  skills: ['Console.ReadLine', 'double.Parse / TryParse', 'switch', 'Fonksiyonlar ve dönüş değerleri', 'try / catch / throw', 'while döngüsü', 'string.Split', 'List (string listesi)', 'Mantık / arayüz ayrımı'],
   steps: [
     {
       title: 'Adım 1 — İki sayı oku ve topla',
@@ -601,7 +601,7 @@ Güle güle!</pre>`,
       },
     },
     {
-      title: 'Adım 8 — Hesap geçmişi: List<string>',
+      title: 'Adım 8 — Hesap geçmişi: string listesi',
       body: `
 <p>Kaç işlem yapılacağı önceden bilinmediği için geçmişi bir diziye değil, büyüyebilen bir <code>List&lt;string&gt;</code>'e koyacağız. İki yeni komut ekliyoruz:</p>
 <ul>
@@ -637,7 +637,7 @@ Güle güle!</pre>`,
         checks: [
           { type: 'output', expect: 'Hesap makinesi (çıkmak için q)\n6 + 2 = 8\nHata: Sıfıra bölme yapılamaz.\n3 * 3 = 9\n--- Geçmiş ---\n1. 6 + 2 = 8\n2. 3 * 3 = 9\nGüle güle!', msg: 'Örnek girdide çıktı birebir aynı olmalı (hatalı işlem geçmişe girmemeli)' },
           { type: 'output', stdin: 'g\n1 - 4\ns\ng\n2 * 5\ng\nq', expect: 'Hesap makinesi (çıkmak için q)\n(geçmiş boş)\n1 - 4 = -3\nGeçmiş temizlendi.\n(geçmiş boş)\n2 * 5 = 10\n--- Geçmiş ---\n1. 2 * 5 = 10\nGüle güle!', msg: 'Boş geçmiş, temizleme (s) ve yeniden ekleme doğru çalışmalı' },
-          { type: 'code', pattern: 'List\\s*<\\s*string\\s*>', msg: 'Geçmişi List<string> içinde tutmalısın' },
+          { type: 'code', pattern: 'List\\s*<\\s*string\\s*>', msg: 'Geçmişi bir string listesinde (List) tutmalısın' },
         ],
         hints: [
           'Döngüden önce bir liste oluştur: <code>var gecmis = new List&lt;string&gt;();</code>',

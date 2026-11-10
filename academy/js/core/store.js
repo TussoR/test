@@ -20,6 +20,7 @@ function fresh() {
     playground: { code: '', stdin: '' },
     settings: { freeNav: false, apiKey: '', model: 'claude-opus-5-5', codeSize: 14, rememberKey: true },
     lastLocation: null,
+    remoteDevices: {}, // senkronizasyon: diğer cihazların çalışma süresi ve istatistikleri (deviceId → { name, study, activity, stats })
   };
 }
 
@@ -97,15 +98,36 @@ export function startStudyTimer() {
   document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') save(true); });
 }
 
+// ---------- cihazlar arası toplamlar ----------
+// Her cihaz kendi sayaçlarını tutar (çift sayımı önler); toplamlar bu cihaz + diğer cihazlar.
+function otherDevices() { return Object.values(state.remoteDevices || {}); }
+export function studyDays() {
+  const out = { ...state.study.days };
+  for (const d of otherDevices()) for (const [k, v] of Object.entries(d.study?.days || {})) out[k] = (out[k] || 0) + v;
+  return out;
+}
+export function studyTotal() { return state.study.total + otherDevices().reduce((a, d) => a + (d.study?.total || 0), 0); }
+export function activityDays() {
+  const out = { ...state.activity };
+  for (const d of otherDevices()) for (const [k, v] of Object.entries(d.activity || {})) out[k] = (out[k] || 0) + v;
+  return out;
+}
+export function aggStats() {
+  const out = { ...state.stats };
+  for (const d of otherDevices()) for (const k of ['runs', 'exerciseAttempts', 'exercisePasses', 'firstTryPasses', 'hintsUsed']) out[k] = (out[k] || 0) + (d.stats?.[k] || 0);
+  return out;
+}
+
 // ---------- türetilmiş istatistikler ----------
 export function streak() {
-  const active = d => (state.study.days[d] || 0) >= 300 || (state.activity[d] || 0) > 0;
+  const sd = studyDays(), ad = activityDays();
+  const active = d => (sd[d] || 0) >= 300 || (ad[d] || 0) > 0;
   let n = 0;
   const d = new Date();
   if (!active(todayKey(d))) d.setDate(d.getDate() - 1); // bugün henüz çalışılmadıysa dünden say
   while (active(todayKey(d))) { n++; d.setDate(d.getDate() - 1); }
   let best = 0, run = 0;
-  const days = Object.keys({ ...state.study.days, ...state.activity }).sort();
+  const days = Object.keys({ ...sd, ...ad }).sort();
   let prev = null;
   for (const k of days) {
     if (!active(k)) continue;
@@ -129,7 +151,7 @@ export function quizScore() {
 }
 
 export function exerciseRate() {
-  const s = state.stats;
+  const s = aggStats();
   return { attempts: s.exerciseAttempts, passes: s.exercisePasses, pct: s.exerciseAttempts ? Math.round(s.exercisePasses / s.exerciseAttempts * 100) : null };
 }
 
@@ -169,7 +191,7 @@ export function level() {
  * AI eğitmen ek alıştırma seçerken ve açıklama derinliğini ayarlarken kullanır.
  */
 export function adaptiveDifficulty() {
-  const s = state.stats;
+  const s = aggStats();
   if (s.exerciseAttempts < 3) return { level: 1, reason: 'Henüz yeterli veri yok — kolaydan başlıyoruz.' };
   const rate = s.exercisePasses / s.exerciseAttempts;
   const passes = Math.max(1, s.exercisePasses);

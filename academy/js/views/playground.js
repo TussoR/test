@@ -92,7 +92,7 @@ let stdinTimer = null;
 export function playgroundView(root) {
   setCrumbs([['Kod Alanı']]);
   const pg = state.playground;
-  const editor = createEditor({ code: pg.code || SAMPLES[0][1], onChange: (c) => { pg.code = c; save(); }, onRun: () => runner.run(), maxHeight: 620 });
+  const editor = createEditor({ code: pg.code || SAMPLES[0][1], onChange: (c) => { pg.code = c; pg.updatedAt = Date.now(); save(); }, onRun: () => runner.run(), maxHeight: 620 });
   const runner = createRunner({ editor, stdin: pg.stdin ?? '', stepper: true, extraButtons: [] });
   const sel = h('select', { style: { width: 'auto' }, 'aria-label': 'Örnek kod', onchange: () => {
     const s = SAMPLES[+sel.value];

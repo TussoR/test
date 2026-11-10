@@ -1,10 +1,11 @@
 // Panel: genel ilerleme, mevcut modül, istatistikler, seri, haftalık plan.
 
 import { h, mount, icon, fmtDuration, todayKey } from '../core/dom.js';
-import { state, streak, quizScore, exerciseRate, level, adaptiveDifficulty } from '../core/store.js';
+import { state, streak, quizScore, exerciseRate, level, adaptiveDifficulty, studyDays, studyTotal } from '../core/store.js';
 import { MODULES, allLessons } from '../content/modules.js';
 import { overallProgress, currentModule, moduleProgress, nextLesson, projectsSummary, lessonDone } from '../core/progress.js';
 import { setCrumbs } from '../main.js';
+import { isConnected } from '../core/sync.js';
 import ROADMAP from '../content/roadmap.js';
 import { currentWeekIndex } from './roadmap.js';
 
@@ -28,10 +29,11 @@ export function dashboardView(root) {
   const interactive = lessons.filter(l => l.interactive);
   const firstTime = !Object.keys(state.lessons).length;
 
+  const sdays = studyDays();
   // son 14 günün etkinliği
   const days = [];
   for (let i = 13; i >= 0; i--) { const d = new Date(); d.setDate(d.getDate() - i); days.push(d); }
-  const maxSec = Math.max(1800, ...days.map(d => state.study.days[todayKey(d)] || 0));
+  const maxSec = Math.max(1800, ...days.map(d => sdays[todayKey(d)] || 0));
   const dayNames = ['Pz', 'Pt', 'Sa', 'Ça', 'Pe', 'Cu', 'Ct'];
 
   const cont = nl ? h('a.btn.primary', { href: `#/lesson/${nl.id}` }, icon('play'), firstTime ? 'İlk derse başla' : 'Kaldığın yerden devam et') : h('a.btn.primary', { href: '#/projects' }, 'Projelere geç');
@@ -52,9 +54,10 @@ export function dashboardView(root) {
       h('div.ring', { style: { '--p': op.pct } }, h('div', h('b', `%${Math.round(op.pct)}`), h('span', 'genel ilerleme'))),
     ),
 
+    isConnected() ? null : h('div.callout', { style: { marginTop: '14px' } }, '☁ ', h('b', 'Telefon ve bilgisayarda aynı ilerleme: '), 'GitHub hesabınla senkronizasyonu aç; derslerin, alıştırmaların ve çalışma süren tüm cihazlarında eşitlensin. ', h('a', { href: '#/settings' }, 'Ayarlar → Senkronizasyon')),
     h('div.grid.c4', { style: { marginTop: '16px' } },
       stat('book', 'Tamamlanan dersler', `${doneLessons}/${lessons.length}`, `${interactive.filter(l => lessonDone(l.id)).length}/${interactive.length} etkileşimli`),
-      stat('clock', 'Toplam çalışma', fmtDuration(state.study.total), `Bugün: ${fmtDuration(state.study.days[todayKey()] || 0)}`),
+      stat('clock', 'Toplam çalışma', fmtDuration(studyTotal()), `Bugün: ${fmtDuration(sdays[todayKey()] || 0)}`),
       stat('flame', 'Günlük seri', `${st.current} gün`, `En uzun: ${st.best} gün${st.todayDone ? ' · bugün ✓' : ''}`),
       stat('star', 'Seviye', lv.name, `${lv.xp} XP · ${lv.ja}`),
       stat('target', 'Quiz ortalaması', qs.pct === null ? '—' : `%${qs.pct}`, qs.total ? `İlk denemede ${qs.correct}/${qs.total} doğru` : 'Henüz quiz yok'),
@@ -70,7 +73,7 @@ export function dashboardView(root) {
         h('p.small.muted', 'XP; tamamlanan dersler, ilk denemede doğru quiz cevapları, alıştırmalar, meydan okumalar ve proje adımlarından gelir. Seviye bir motivasyon göstergesidir — iş garantisi değil, gerçek beceri ölçüsü projelerindir.'),
         h('h3', { style: { marginTop: '14px' } }, 'Son 14 gün'),
         h('div.activity', days.map(d => {
-          const sec = state.study.days[todayKey(d)] || 0;
+          const sec = sdays[todayKey(d)] || 0;
           return h('div', { class: (sec > 0 ? 'has ' : '') + (todayKey(d) === todayKey() ? 'today' : ''), style: { height: `${Math.max(4, sec / maxSec * 100)}%` }, title: `${todayKey(d)}: ${fmtDuration(sec)}` });
         })),
         h('div.act-labels', days.map(d => h('span', dayNames[d.getDay()]))),

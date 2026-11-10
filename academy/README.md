@@ -14,7 +14,7 @@ python3 -m http.server 8000
 # tarayıcıda: http://localhost:8000/academy/
 ```
 
-GitHub Pages ile yayınlanıyorsa `…/academy/` adresinden açılır. İlerleme tarayıcının `localStorage`'ında saklanır (Ayarlar → dışa/içe aktar ile yedeklenir).
+GitHub Pages ile yayınlanıyorsa `…/academy/` adresinden açılır. İlerleme tarayıcının `localStorage`'ında saklanır. **Cihazlar arası senkronizasyon** (Ayarlar): kullanıcının kendi GitHub hesabında özel bir Gist'e (`kaihatsu-akademi-ilerleme.json`) yazılır; yalnızca `gist` izinli bir token gerekir, telefon QR kodla bağlanır. Birleştirme ilerleme kaybetmez (tamamlanan her şey birleşimdir); çalışma süresi ve sayaçlar cihaz başına tutulup toplanır. Ayrıca Ayarlar → dışa/içe aktar ile JSON yedeği alınabilir.
 
 ## Neler var?
 

@@ -24,7 +24,7 @@ export function createExercise(o) {
   saved.attempts ??= 0; saved.hintsUsed ??= 0;
   const editor = createEditor({
     code: saved.code ?? ex.starter ?? '',
-    onChange: (c) => { saved.code = c; save(); },
+    onChange: (c) => { saved.code = c; saved.codeAt = Date.now(); save(); },
     onRun: () => runner.run(),
     maxHeight: 460,
   });

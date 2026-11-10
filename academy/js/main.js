@@ -1,7 +1,7 @@
 // Uygulama kabuğu: kenar çubuğu, üst çubuk, yönlendirici (hash router), eğitmen çekmecesi.
 
 import { h, mount, icon, fmtDuration, todayKey } from './core/dom.js';
-import { state, onChange, startStudyTimer, streak } from './core/store.js';
+import { state, onChange, startStudyTimer, streak, studyDays } from './core/store.js';
 import { MODULES } from './content/modules.js';
 import { moduleProgress } from './core/progress.js';
 import { setCtx } from './core/context.js';
@@ -15,6 +15,7 @@ import { vocabView } from './views/vocab.js';
 import { searchView } from './views/search.js';
 import { settingsView, applySettings } from './views/settings.js';
 import { createTutor } from './tutor/tutor.js';
+import { startAutoSync, connect, onSyncStatus, syncStatus, isConnected, syncNow } from './core/sync.js';
 
 const ROUTES = [
   [/^\/?$/, dashboardView, 'dashboard'],
@@ -29,6 +30,7 @@ const ROUTES = [
   [/^\/tutor$/, tutorPage, 'tutor'],
   [/^\/search$/, searchView, 'search'],
   [/^\/settings$/, settingsView, 'settings'],
+  [/^\/sync$/, syncLinkView, 'settings'],
 ];
 
 const NAV = [
@@ -55,10 +57,11 @@ searchInput.addEventListener('keydown', (e) => { if (e.key === 'Enter' && search
 const streakPill = h('span.pill.streak', { title: 'Günlük seri' });
 const timePill = h('span.pill.time', { title: 'Bugünkü çalışma süresi' });
 const menuBtn = h('button.icon-btn.menu-btn', { 'aria-label': 'Menüyü aç', onclick: () => toggleSidebar() }, icon('menu'));
+const syncPill = h('button.pill', { style: { cursor: 'pointer' }, onclick: () => { if (isConnected()) syncNow(); else navigate('#/settings'); } });
 const tutorBtn = h('button.icon-btn', { 'aria-label': 'AI eğitmeni aç', title: 'AI Eğitmen', onclick: () => openTutor() }, icon('bot'));
 const topbar = h('header.topbar', menuBtn, crumbsEl,
   h('div.top-search', icon('search'), searchInput, h('kbd', '/')),
-  streakPill, timePill, tutorBtn);
+  syncPill, streakPill, timePill, tutorBtn);
 const view = h('main.view', { id: 'view', tabindex: '-1' });
 const scrim = h('div.scrim', { onclick: () => { toggleSidebar(false); closeTutor(); } });
 const drawer = h('div.tutor-drawer', { role: 'dialog', 'aria-label': 'AI Eğitmen' });
@@ -91,6 +94,40 @@ document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape' && drawer.classList.contains('open') && !/textarea/i.test(document.activeElement?.tagName)) closeTutor();
 });
 
+// QR / bağlantı ile telefonda tek dokunuşla senkronizasyon kurulumu: #/sync?t=TOKEN
+async function syncLinkView(root, _p, query) {
+  const t = query.get('t');
+  history.replaceState(null, '', '#/settings'); // token tarayıcı geçmişinde kalmasın
+  setCrumbs([['Senkronizasyon']]);
+  mount(root, h('div.page', h('div.card', { style: { maxWidth: '560px', margin: '40px auto', textAlign: 'center' } }, h('h2', '☁ Bağlanılıyor…'), h('p.muted', 'Diğer cihazındaki ilerleme alınıyor.'))));
+  if (!t) { navigate('#/settings'); return; }
+  try {
+    const r = await connect(t, '');
+    mount(root, h('div.page', h('div.card', { style: { maxWidth: '560px', margin: '40px auto', textAlign: 'center' } },
+      h('h2', '✓ Senkronizasyon açık'), h('p.muted', `GitHub hesabı: ${r.login}. Bu cihazdaki ilerleme artık diğer cihazlarınla eşitlenecek.`),
+      h('div.row', { style: { justifyContent: 'center' } }, h('a.btn.primary', { href: '#/' }, 'Panele git'), h('a.btn', { href: '#/settings' }, 'Ayarlar')))));
+  } catch (e) {
+    mount(root, h('div.page', h('div.card', { style: { maxWidth: '560px', margin: '40px auto', textAlign: 'center' } },
+      h('h2', 'Bağlanılamadı'), h('p.muted', e.message), h('a.btn', { href: '#/settings' }, 'Ayarlar\'a git'))));
+  }
+}
+
+function renderSyncPill() {
+  if (!isConnected()) { mount(syncPill, '☁ Eşitle'); syncPill.title = 'Bilgisayar ve telefon arasında ilerlemeni eşitle (Ayarlar)'; syncPill.style.opacity = '.7'; return; }
+  syncPill.style.opacity = '1';
+  const m = { ok: ['☁ ✓', 'Eşitlendi'], syncing: ['☁ …', 'Eşitleniyor'], error: ['☁ !', 'Eşitleme hatası: ' + syncStatus.message], off: ['☁', 'Bekliyor'] }[syncStatus.state] || ['☁', ''];
+  mount(syncPill, m[0]);
+  syncPill.title = m[1] + (syncStatus.lastSync ? ` · son: ${syncStatus.lastSync.toLocaleTimeString('tr-TR')}` : '') + ' · tıkla: şimdi eşitle';
+  syncPill.style.color = syncStatus.state === 'error' ? 'var(--err)' : syncStatus.state === 'ok' ? 'var(--ok)' : '';
+}
+onSyncStatus(() => {
+  renderSyncPill();
+  if (syncStatus.state !== 'ok') return;
+  renderPills();
+  // başka cihazdan yeni ilerleme geldiyse, düzenleme yapılmayan sayfaları tazele
+  if (syncStatus.changed && ['dashboard', 'curriculum', 'projects', 'roadmap', 'vocab'].includes(currentActive) && !/input|textarea|select/i.test(document.activeElement?.tagName)) route();
+});
+
 function tutorPage(root) {
   setCrumbs([['AI Eğitmen']]);
   closeTutor();
@@ -115,7 +152,7 @@ function renderPills() {
   const s = streak();
   mount(streakPill, icon('flame'), h('b', String(s.current)), s.current === 1 ? ' gün' : ' gün seri');
   streakPill.title = s.todayDone ? 'Bugünkü hedefe ulaştın' : 'Seriyi sürdürmek için bugün en az 5 dk çalış ya da bir alıştırma çöz';
-  mount(timePill, icon('clock'), fmtDuration(state.study.days[todayKey()] || 0), ' bugün');
+  mount(timePill, icon('clock'), fmtDuration(studyDays()[todayKey()] || 0), ' bugün');
 }
 
 export function setCrumbs(parts) {
@@ -157,6 +194,8 @@ onChange(() => { clearTimeout(navTimer); navTimer = setTimeout(() => renderNav(c
 
 applySettings();
 startStudyTimer();
+renderSyncPill();
+startAutoSync();
 renderPills();
 setInterval(renderPills, 30000);
 route();

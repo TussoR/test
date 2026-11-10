@@ -33,7 +33,7 @@ export function didYouMean(name, code) {
 }
 
 export function errorNameFromMessage(msg) {
-  return /'([^']+)'(?: does not| is inaccessible)/.exec(msg)?.[1] || /definition for '([^']+)'/.exec(msg)?.[1] || null;
+  return /definition for '([^']+)'/.exec(msg)?.[1] || /'([^']+)'(?: does not| is inaccessible)/.exec(msg)?.[1] || null;
 }
 
 /**

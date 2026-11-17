@@ -5,6 +5,40 @@ import { state, save, exportData, importData, resetAll } from '../core/store.js'
 import { setCrumbs } from '../main.js';
 import { syncConfig, isConnected, connect, disconnect, syncNow, setDeviceName, onSyncStatus, syncStatus, overwriteRemoteWithLocal, deviceId } from '../core/sync.js';
 import { fmtDuration } from '../core/dom.js';
+import { canPrompt, promptInstall, isStandalone, onInstallChange, downloadWindowsShortcut, downloadMacShortcut, platform, appUrl } from '../core/install.js';
+
+/** Masaüstü / ana ekran kurulumu kartı. */
+function installCard() {
+  const box = h('div.card');
+  const render = () => {
+    const pf = platform();
+    if (isStandalone()) {
+      mount(box, h('h3', '🖥 Uygulama olarak yüklü'), h('p.small.muted', 'Kaihatsu Akademi şu an kendi penceresinde, kurulu uygulama olarak çalışıyor. Masaüstündeki / Başlat menüsündeki simgeden açabilirsin.'));
+      return;
+    }
+    const steps = pf === 'ios'
+      ? [h('li', h('b', 'Safari'), ' ile aç → Paylaş 📤 → ', h('b', 'Ana Ekrana Ekle'), '.'), h('li', 'Comet/Chrome\'da Paylaş menüsünde "Ana Ekrana Ekle" varsa onu kullan; yoksa Safari\'den ekle.')]
+      : pf === 'android'
+        ? [h('li', 'Tarayıcı menüsü (⋮) → ', h('b', 'Uygulamayı yükle'), ' veya ', h('b', 'Ana ekrana ekle'), '.')]
+        : [
+          h('li', h('b', 'Chrome / Edge / Comet (Windows, Mac): '), 'adres çubuğunun sağındaki ', h('b', 'yükle simgesine (⊕ / 🖥)'), ' tıkla. Görmüyorsan: Chrome → ⋮ → ', h('b', 'Yayınla, kaydet ve paylaş → Sayfayı uygulama olarak yükle'), '; Edge → … → ', h('b', 'Uygulamalar → Bu siteyi uygulama olarak yükle'), '. Uygulama kendi penceresinde açılır; masaüstüne ve Başlat menüsüne simge eklenir.'),
+          pf === 'mac' ? h('li', h('b', 'Safari (macOS Sonoma ve sonrası): '), 'Dosya → ', h('b', 'Dock\'a Ekle'), '.') : null,
+          h('li', h('b', 'Her tarayıcıda çalışan basit yol: '), 'aşağıdaki düğmeyle bir masaüstü kısayolu indir ve dosyayı ', h('b', 'Masaüstü'), ' klasörüne taşı. Çift tıklayınca uygulama varsayılan tarayıcında açılır.'),
+        ];
+    mount(box,
+      h('h3', '🖥 Masaüstüne / ana ekrana kur'),
+      h('p.small.muted', 'Uygulamayı bir program gibi kurabilirsin: kendi penceresinde açılır, simgesi masaüstünde olur ve internet yokken de son açtığın hali çalışır. İlerlemen aynı kalır (senkronizasyon açıksa tüm cihazlarda).'),
+      canPrompt() ? h('div', { style: { margin: '10px 0' } }, h('button.btn.primary', { onclick: async () => { await promptInstall(); render(); } }, '🖥 Tek tıkla yükle')) : null,
+      h('ol.prose.small', steps),
+      pf === 'windows' || pf === 'other' ? h('button.btn', { onclick: downloadWindowsShortcut }, '⬇ Windows masaüstü kısayolu (.url)') : null,
+      pf === 'mac' ? h('button.btn', { onclick: downloadMacShortcut }, '⬇ Mac masaüstü kısayolu (.webloc)') : null,
+      h('p.small.muted', { style: { marginTop: '8px' } }, 'Adres: ', h('code.inline', appUrl())),
+    );
+  };
+  render();
+  const off = onInstallChange(() => { if (!document.body.contains(box)) { off(); return; } render(); });
+  return box;
+}
 
 const TOKEN_URL = 'https://github.com/settings/tokens/new?scopes=gist&description=Kaihatsu%20Akademi%20senkronizasyon';
 const QR_LIB = 'https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js';
@@ -115,6 +149,7 @@ export function settingsView(root) {
     h('div.eyebrow', 'Ayarlar'), h('h1', 'Ayarlar'),
 
     syncCard(),
+    installCard(),
 
     h('div.card',
       h('h3', 'AI Eğitmen — Claude bağlantısı (isteğe bağlı)'),

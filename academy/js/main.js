@@ -15,6 +15,7 @@ import { vocabView } from './views/vocab.js';
 import { searchView } from './views/search.js';
 import { settingsView, applySettings } from './views/settings.js';
 import { createTutor } from './tutor/tutor.js';
+import { initInstall, onInstallChange, canPrompt, promptInstall, isStandalone } from './core/install.js';
 import { startAutoSync, connect, onSyncStatus, syncStatus, isConnected, syncNow } from './core/sync.js';
 
 const ROUTES = [
@@ -45,11 +46,18 @@ const NAV = [
 ];
 
 // ---------- kabuk ----------
+const installSlot = h('div', { style: { marginBottom: '8px' } });
+function renderInstall() {
+  if (isStandalone()) { installSlot.innerHTML = ''; return; }
+  mount(installSlot, canPrompt()
+    ? h('button.btn.sm.primary', { style: { width: '100%' }, onclick: async () => { const r = await promptInstall(); if (r === 'accepted') renderInstall(); } }, '🖥 Masaüstüne yükle')
+    : h('a.btn.sm', { href: '#/settings', style: { width: '100%' } }, '🖥 Masaüstüne / ana ekrana ekle'));
+}
 const navEl = h('nav.nav', { 'aria-label': 'Ana gezinme' });
 const sidebar = h('aside.sidebar',
   h('div.brand', h('div.brand-mark', '開'), h('div', h('div.brand-name', 'Kaihatsu Akademi'), h('div.brand-sub', 'C# · 3D · CAD — 開発への道'))),
   navEl,
-  h('div.sidebar-foot', 'İlerlemen bu tarayıcıda otomatik kaydedilir.'),
+  h('div.sidebar-foot', installSlot, 'İlerlemen bu tarayıcıda otomatik kaydedilir.'),
 );
 const crumbsEl = h('div.crumbs');
 const searchInput = h('input', { type: 'search', placeholder: 'Müfredatta ara…', 'aria-label': 'Müfredatta ara' });
@@ -192,6 +200,9 @@ onChange(() => { renderPills(); });
 let navTimer = null;
 onChange(() => { clearTimeout(navTimer); navTimer = setTimeout(() => renderNav(currentActive), 400); });
 
+initInstall();
+onInstallChange(renderInstall);
+renderInstall();
 applySettings();
 startStudyTimer();
 renderSyncPill();
